@@ -14,7 +14,7 @@
 - CSS
 - JavaScript
 ## Сайт
-https://annamukha.github.io/cinema-diplom/
+https://annamukha.github.io/shfe-diplom/
 
 ### Вход в админку
 
