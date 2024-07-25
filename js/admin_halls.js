@@ -1,104 +1,104 @@
 // Управление залами
 
-const infoHalls = document.querySelector(".halls__info");
-const listHalls = document.querySelector(".halls__list");
-const buttonHall = document.querySelector(".admin__button_hall");
-let buttonRemoveHall;
+const hallsInfo = document.querySelector(".halls__info");
+const hallsList = document.querySelector(".halls__list");
+const hallButton = document.querySelector(".admin__button_hall");
+let hallRemoveButton;
 
 // Конфигурация залов
 
-const configHalls = document.querySelector(".hall-config");
-const listConfigHalls = document.querySelector(".hall-config__list");
-let itemsConfigHalls;
-const wrapperConfigHalls = document.querySelector(".hall-config__wrapper");
-let arrayConfigHalls = [];
+const hallsConfig = document.querySelector(".hall-config");
+const hallsConfigList = document.querySelector(".hall-config__list");
+let hallsConfigItems;
+const hallsConfigWrapper = document.querySelector(".hall-config__wrapper");
+let hallConfigArray = [];
 
 // Схема зала
 
-let currentConfigHall;
-let currentIndexConfigHall;
-let newArrayConfigHall;
+let currentHallConfig;
+let currentHallConfigIndex;
+let newHallConfigArray;
 
-let formConfigHall;
-let rowsConfigHall;
-let placesConfigHall;
-let schemeHall;
-let rowsSchemeHall;
-let placesSchemeHall;
-let chairsHall;
-let cancelConfigHall;
-let saveConfigHall;
+let hallConfigForm;
+let hallConfigRows;
+let hallConfigPlaces;
+let hallScheme;
+let hallSchemeRows;
+let hallSchemePlaces;
+let hallChairs;
+let hallConfigCancel;
+let hallConfigSave;
 
 // Конфигурация цен
 
-const configPrices = document.querySelector(".price-config");
-const listConfigPrices = document.querySelector(".price-config__list");
-let itemsConfigPrices;
-const wrapperConfigPrices = document.querySelector(".price-config__wrapper");
-let formConfigPrices;
-let standardConfigPrice;
-let vipConfigPrice;
-let cancelConfigPrice;
-let saveConfigPrice;
+const priceConfig = document.querySelector(".price-config");
+const priceConfigList = document.querySelector(".price-config__list");
+let priceConfigItems;
+const priceConfigWrapper = document.querySelector(".price-config__wrapper");
+let priceConfigForm;
+let priceConfigStandart;
+let priceConfigVip;
+let priceConfigCancel;
+let priceConfigSave;
 
-let currentConfigPrice;
+let currentPriceConfig;
 
 // Открыть продажи
 
-const sellsOpen = document.querySelector(".open");
-const listOpen = document.querySelector(".open__list");
-const wrapperOpen = document.querySelector(".open__wrapper");
-let infoOpen;
-let buttonOpen;
+const openSells = document.querySelector(".open");
+const openList = document.querySelector(".open__list");
+const openWrapper = document.querySelector(".open__wrapper");
+let openInfo;
+let openButton;
 let currentOpen;
 
-let statusCurrentHall;
-let statusNewHall;
+let hallCurrentStatus;
+let hallNewStatus;
 
 // Залы в Сетке сеансов
 
-const timelinesMovieSeances = document.querySelector(".movie-seances__timelines");
-let deleteTimeline;
+const movieSeancesTimelines = document.querySelector(".movie-seances__timelines");
+let timelineDelete;
 
 // Проверка наличия залов в блоке "Доступные залы"
 
-function verifyHallsList() {
-  if (listHalls.innerText) {
-    infoHalls.classList.remove("hidden");
-    listHalls.classList.remove("hidden");
-    configHalls.classList.remove("hidden");
-    timelinesMovieSeances.classList.remove("hidden");
-    sellsOpen.classList.remove("hidden");
+function checkHallsList() {
+  if (hallsList.innerText) {
+    hallsInfo.classList.remove("hidden");
+    hallsList.classList.remove("hidden");
+    hallsConfig.classList.remove("hidden");
+    movieSeancesTimelines.classList.remove("hidden");
+    openSells.classList.remove("hidden");
   } else {
-    infoHalls.classList.add("hidden");
-    listHalls.classList.add("hidden");
-    configHalls.classList.add("hidden");
-    timelinesMovieSeances.classList.add("hidden");
-    sellsOpen.classList.add("hidden");
+    hallsInfo.classList.add("hidden");
+    hallsList.classList.add("hidden");
+    hallsConfig.classList.add("hidden");
+    movieSeancesTimelines.classList.add("hidden");
+    openSells.classList.add("hidden");
   }
 }
 
 // Открытие popup "Добавить зал"
 
-buttonHall.addEventListener("click", () => {
-  addHallPopup.classList.remove("popup__hidden");
+hallButton.addEventListener("click", () => {
+  popupHallAdd.classList.remove("popup__hidden");
 })
 
 // popup Добавление зала
 
-const addHallPopup = document.querySelector(".popup__hall_add");
+const popupHallAdd = document.querySelector(".popup__hall_add");
 const formAddHall = document.querySelector(".popup__form_add-hall");
 const inputAddHall = document.querySelector(".add-hall_input");
-const buttonAddHall = document.querySelector(".popup__add-hall_button_add");
+const buttonHallAdd = document.querySelector(".popup__add-hall_button_add");
 
 // Добавить зал
 
 formAddHall.addEventListener("submit", (e) => {
   e.preventDefault();
-  addHallToList(inputAddHall);
+  addHall(inputAddHall);
 })
 
-function addHallToList(inputAddHall) {
+function addHall(inputAddHall) {
   const formData = new FormData();
   formData.set("hallName", `${inputAddHall.value}`);
 
@@ -110,9 +110,9 @@ function addHallToList(inputAddHall) {
       .then(response => response.json())
       .then(function(data) {
         console.log(data);  
-        listHalls.insertAdjacentHTML("beforeend", `
+        hallsList.insertAdjacentHTML("beforeend", `
         <li class="halls__list_item">
-          <span class="halls__list_name" data-id="${data.result.halls.id}">${inputAddHall.value}</span> <span class="admin__button_remove hall_remove"></span>
+          <span class="halls__list_name" data-id="${data.result.halls.id}>${inputAddHall.value}</span> <span class="admin__button_remove hall_remove"></span></p>
         </li>
         `);
 
@@ -124,7 +124,7 @@ function addHallToList(inputAddHall) {
 
 // Удаление зала в блоке "Доступные залы"
 
-function removeHall(hallId) {
+function deleteHall(hallId) {
   fetch(`https://shfe-diplom.neto-server.ru/hall/${hallId}`, {
     method: "DELETE",
   })
@@ -137,28 +137,28 @@ function removeHall(hallId) {
 
 // Отрисовка зала
 
-function renderHall(data, currentIndexConfigHall) {
-  rowsConfigHall.value = data.result.halls[currentIndexConfigHall].hall_rows;
-  placesConfigHall.value = data.result.halls[currentIndexConfigHall].hall_places;
+function showHall(data, currentHallConfigIndex) {
+  hallConfigRows.value = data.result.halls[currentHallConfigIndex].hall_rows;
+  hallConfigPlaces.value = data.result.halls[currentHallConfigIndex].hall_places;
   
-  schemeHall.innerHTML = "";
-  arrayConfigHalls.splice(0, arrayConfigHalls.length);
+  hallScheme.innerHTML = "";
+  hallConfigArray.splice(0, hallConfigArray.length);
 
-  data.result.halls[currentIndexConfigHall].hall_config.forEach(element => {
-    schemeHall.insertAdjacentHTML("beforeend", `<div class="hall-config__hall_row"></div>`);
+  data.result.halls[currentHallConfigIndex].hall_config.forEach(element => {
+    hallScheme.insertAdjacentHTML("beforeend", `<div class="hall-config__hall_row"></div>`);
   })
 
-  rowsSchemeHall = document.querySelectorAll(".hall-config__hall_row");
+  hallSchemeRows = document.querySelectorAll(".hall-config__hall_row");
 
-  for(let i = 0; i < rowsSchemeHall.length; i++) {
-    for(let j = 0; j < data.result.halls[currentIndexConfigHall].hall_config[0].length; j++) {
-      rowsSchemeHall[i].insertAdjacentHTML("beforeend", `<span class="hall-config__hall_chair" data-type="${data.result.halls[currentIndexConfigHall].hall_config[i][j]}"></span>`);
+  for(let i = 0; i < hallSchemeRows.length; i++) {
+    for(let j = 0; j < data.result.halls[currentHallConfigIndex].hall_config[0].length; j++) {
+      hallSchemeRows[i].insertAdjacentHTML("beforeend", `<span class="hall-config__hall_chair" data-type="${data.result.halls[currentHallConfigIndex].hall_config[i][j]}"></span>`);
     }
   }
 
-  chairsHall = document.querySelectorAll(".hall-config__hall_chair");
+  hallChairs = document.querySelectorAll(".hall-config__hall_chair");
 
-  chairsHall.forEach(element => {
+  hallChairs.forEach(element => {
     if (element.dataset.type === "vip") {
       element.classList.add("place_vip");
     } else if (element.dataset.type === "standart") {
@@ -168,43 +168,43 @@ function renderHall(data, currentIndexConfigHall) {
     }
   })
 
-  arrayConfigHalls = JSON.parse(JSON.stringify(data.result.halls[currentIndexConfigHall].hall_config));
+  hallConfigArray = JSON.parse(JSON.stringify(data.result.halls[currentHallConfigIndex].hall_config));
 }
 
 // Изменение типа мест на схеме зала
 
-function modifyPlaces(rowsSchemeHall, data) {
-  newArrayConfigHall = JSON.parse(JSON.stringify(arrayConfigHalls));
+function changePlaces(hallSchemeRows, data) {
+  newHallConfigArray = JSON.parse(JSON.stringify(hallConfigArray));
 
-  let changeRowsHall = Array.from(rowsSchemeHall);
-  changeRowsHall.forEach(row => {
-    let rowIndex = changeRowsHall.findIndex(currentRow => currentRow === row);
-    let changePlacesHall = Array.from(row.children);
-    changePlacesHall.forEach(place => {
+  let hallChangeRows = Array.from(hallSchemeRows);
+  hallChangeRows.forEach(row => {
+    let rowIndex = hallChangeRows.findIndex(currentRow => currentRow === row);
+    let hallChangePlaces = Array.from(row.children);
+    hallChangePlaces.forEach(place => {
       place.style.cursor = "pointer";
-      let placeIndex = changePlacesHall.findIndex(currentPlace => currentPlace === place);
+      let placeIndex = hallChangePlaces.findIndex(currentPlace => currentPlace === place);
       
       place.addEventListener("click", () => {
         if(place.classList.contains("place_standart")) {
           place.classList.replace("place_standart", "place_vip");
           place.dataset.type = "vip";
-          newArrayConfigHall[rowIndex][placeIndex] = "vip";
+          newHallConfigArray[rowIndex][placeIndex] = "vip";
         } else if (place.classList.contains("place_vip")) {
           place.classList.replace("place_vip", "place_block");
           place.dataset.type = "disabled";
-          newArrayConfigHall[rowIndex][placeIndex] = "disabled";
+          newHallConfigArray[rowIndex][placeIndex] = "disabled";
         } else {
           place.classList.replace("place_block", "place_standart");
           place.dataset.type = "standart";
-          newArrayConfigHall[rowIndex][placeIndex] = "standart";
+          newHallConfigArray[rowIndex][placeIndex] = "standart";
         }
 
-        if(JSON.stringify(newArrayConfigHall) !== JSON.stringify(data.result.halls[currentIndexConfigHall].hall_config)) {
-          cancelConfigHall.classList.remove("button_disabled");
-          saveConfigHall.classList.remove("button_disabled");
+        if(JSON.stringify(newHallConfigArray) !== JSON.stringify(data.result.halls[currentHallConfigIndex].hall_config)) {
+          hallConfigCancel.classList.remove("button_disabled");
+          hallConfigSave.classList.remove("button_disabled");
         } else {
-          cancelConfigHall.classList.add("button_disabled");
-          saveConfigHall.classList.add("button_disabled");
+          hallConfigCancel.classList.add("button_disabled");
+          hallConfigSave.classList.add("button_disabled");
         }
       })
     })
@@ -213,48 +213,48 @@ function modifyPlaces(rowsSchemeHall, data) {
 
 // Изменение размера зала
 
-function resizeHall(newArrayConfigHall, data) {
-  formConfigHall.addEventListener("input", () => {
-    newArrayConfigHall.splice(0, newArrayConfigHall.length);
+function changeHallSize(newHallConfigArray, data) {
+  hallConfigForm.addEventListener("input", () => {
+    newHallConfigArray.splice(0, newHallConfigArray.length);
 
-    schemeHall.innerHTML = "";
+    hallScheme.innerHTML = "";
 
-    for(let i = 0; i < rowsConfigHall.value; i++) {
-      schemeHall.insertAdjacentHTML("beforeend", `<div class="hall-config__hall_row"></div>`);
-      newArrayConfigHall.push(new Array());
+    for(let i = 0; i < hallConfigRows.value; i++) {
+      hallScheme.insertAdjacentHTML("beforeend", `<div class="hall-config__hall_row"></div>`);
+      newHallConfigArray.push(new Array());
     }
 
-    rowsSchemeHall = Array.from(document.querySelectorAll(".hall-config__hall_row"));
+    hallSchemeRows = Array.from(document.querySelectorAll(".hall-config__hall_row"));
       
-    for(let i = 0; i < rowsConfigHall.value; i++) {
-      for(let j = 0; j < placesConfigHall.value; j++) {
-        rowsSchemeHall[i].insertAdjacentHTML("beforeend", `<span class="hall-config__hall_chair place_standart" data-type="standart"></span>`);
-        newArrayConfigHall[i].push("standart");
+    for(let i = 0; i < hallConfigRows.value; i++) {
+      for(let j = 0; j < hallConfigPlaces.value; j++) {
+        hallSchemeRows[i].insertAdjacentHTML("beforeend", `<span class="hall-config__hall_chair place_standart" data-type="standart"></span>`);
+        newHallConfigArray[i].push("standart");
       }
     }
 
-    if(JSON.stringify(newArrayConfigHall) !== JSON.stringify(data.result.halls[currentIndexConfigHall].hall_config)) {
-      cancelConfigHall.classList.remove("button_disabled");
-      saveConfigHall.classList.remove("button_disabled");
+    if(JSON.stringify(newHallConfigArray) !== JSON.stringify(data.result.halls[currentHallConfigIndex].hall_config)) {
+      hallConfigCancel.classList.remove("button_disabled");
+      hallConfigSave.classList.remove("button_disabled");
     } else {
-      cancelConfigHall.classList.add("button_disabled");
-      saveConfigHall.classList.add("button_disabled");
+      hallConfigCancel.classList.add("button_disabled");
+      hallConfigSave.classList.add("button_disabled");
     }
 
-    modifyPlaces(rowsSchemeHall, data);
+    changePlaces(hallSchemeRows, data);
   })
 }
 
 // Сохранение конфигурации зала
 
-function saveHallConfig(currentConfigHall, newArrayConfigHall) {
+function saveConfig(currentHallConfig, newHallConfigArray) {
   const params = new FormData();
 
-  params.set("rowCount", `${rowsConfigHall.value}`);
-  params.set("placeCount", `${placesConfigHall.value}`);
-  params.set("config", JSON.stringify(newArrayConfigHall)); 
+  params.set("rowCount", `${hallConfigRows.value}`);
+  params.set("placeCount", `${hallConfigPlaces.value}`);
+  params.set("config", JSON.stringify(newHallConfigArray)); 
 
-  fetch(`https://shfe-diplom.neto-server.ru/hall/${currentConfigHall}`, {
+  fetch(`https://shfe-diplom.neto-server.ru/hall/${currentHallConfig}`, {
     method: "POST",
     body: params 
     })
@@ -268,19 +268,19 @@ function saveHallConfig(currentConfigHall, newArrayConfigHall) {
 
 // Отображение цен
 
-function renderPrices(data, currentConfigPrice) {
+function showPrices(data, currentPriceConfig) {
   for(let i = 0; i < data.result.halls.length; i++) {
-    if(data.result.halls[i].id === Number(currentConfigPrice)) {
-      standardConfigPrice.value = data.result.halls[i].hall_price_standart;
-      vipConfigPrice.value = data.result.halls[i].hall_price_vip;
+    if(data.result.halls[i].id === Number(currentPriceConfig)) {
+      priceConfigStandart.value = data.result.halls[i].hall_price_standart;
+      priceConfigVip.value = data.result.halls[i].hall_price_vip;
       
-      formConfigPrices.addEventListener("input", () => {
-        if(standardConfigPrice.value === data.result.halls[i].hall_price_standart && vipConfigPrice.value ===data.result.halls[i].hall_price_vip) {
-          cancelConfigPrice.classList.add("button_disabled");
-          saveConfigPrice.classList.add("button_disabled");
+      priceConfigForm.addEventListener("input", () => {
+        if(priceConfigStandart.value === data.result.halls[i].hall_price_standart && priceConfigVip.value ===data.result.halls[i].hall_price_vip) {
+          priceConfigCancel.classList.add("button_disabled");
+          priceConfigSave.classList.add("button_disabled");
         } else {
-          cancelConfigPrice.classList.remove("button_disabled");
-          saveConfigPrice.classList.remove("button_disabled");
+          priceConfigCancel.classList.remove("button_disabled");
+          priceConfigSave.classList.remove("button_disabled");
         }
       })
     }
@@ -289,12 +289,12 @@ function renderPrices(data, currentConfigPrice) {
 
 // Сохранение конфигурации цен
 
-function saveHallPrices(currentConfigPrice) {
+function savePrices(currentPriceConfig) {
   const params = new FormData();
-  params.set("priceStandart", `${standardConfigPrice.value}`);
-  params.set("priceVip", `${vipConfigPrice.value}`);
+  params.set("priceStandart", `${priceConfigStandart.value}`);
+  params.set("priceVip", `${priceConfigVip.value}`);
 
-  fetch(`https://shfe-diplom.neto-server.ru/price/${currentConfigPrice}`, {
+  fetch(`https://shfe-diplom.neto-server.ru/price/${currentPriceConfig}`, {
     method: "POST",
     body: params 
   })
@@ -308,14 +308,14 @@ function saveHallPrices(currentConfigPrice) {
 
 // Проверка, открыт ли зал
 
-function verifyHallOpen(data, currentOpen) {
-  infoOpen = document.querySelector(".open__info");
-  buttonOpen = document.querySelector(".admin__button_open");
-  let seancesCount = 0;
+function checkHallOpen(data, currentOpen) {
+  openInfo = document.querySelector(".open__info");
+  openButton = document.querySelector(".admin__button_open");
+  let hasSeances = 0;
 
   for(let i = 0; i < data.result.halls.length; i++) {
     if(data.result.halls[i].id === Number(currentOpen)) {
-      statusCurrentHall = data.result.halls[i].hall_open;
+      hallCurrentStatus = data.result.halls[i].hall_open;
     }
   }
 
@@ -323,33 +323,33 @@ function verifyHallOpen(data, currentOpen) {
 
   for (let i = 0; i < data.result.seances.length; i++) {
     if(data.result.seances[i].seance_hallid === Number(currentOpen)) {
-      seancesCount++;
+      hasSeances++;
     }
   }
 
-  if((statusCurrentHall === 0) && (seancesCount === 0)) {
-    buttonOpen.textContent = "Открыть продажу билетов";
-    infoOpen.textContent = "Добавьте сеансы в зал для открытия";
-    buttonOpen.classList.add("button_disabled");
-  } else if ((statusCurrentHall === 0) && (seancesCount > 0)) {
-    buttonOpen.textContent = "Открыть продажу билетов";
-    statusNewHall = 1;
-    infoOpen.textContent = "Всё готово к открытию";
-    buttonOpen.classList.remove("button_disabled");
+  if((hallCurrentStatus === 0) && (hasSeances === 0)) {
+    openButton.textContent = "Открыть продажу билетов";
+    openInfo.textContent = "Добавьте сеансы в зал для открытия";
+    openButton.classList.add("button_disabled");
+  } else if ((hallCurrentStatus === 0) && (hasSeances > 0)) {
+    openButton.textContent = "Открыть продажу билетов";
+    hallNewStatus = 1;
+    openInfo.textContent = "Всё готово к открытию";
+    openButton.classList.remove("button_disabled");
   } else {
-    buttonOpen.textContent = "Приостановить продажу билетов";
-    statusNewHall = 0;
-    infoOpen.textContent = "Зал открыт";
-    buttonOpen.classList.remove("button_disabled");
+    openButton.textContent = "Приостановить продажу билетов";
+    hallNewStatus = 0;
+    openInfo.textContent = "Зал открыт";
+    openButton.classList.remove("button_disabled");
   }
 }
 
 // Изменить статус зала
 
-function toggleHallOpen(currentOpen, statusNewHall) {
+function openCloseHall(currentOpen, hallNewStatus) {
   const params = new FormData();
-  params.set("hallOpen", `${statusNewHall}`)
-  fetch(`https://shfe-diplom.neto-server.ru/open/${currentOpen}`, {
+  params.set("hallOpen", `${hallNewStatus}`)
+  fetch( `https://shfe-diplom.neto-server.ru/open/${currentOpen}`, {
     method: "POST",
     body: params 
   })
@@ -363,43 +363,43 @@ function toggleHallOpen(currentOpen, statusNewHall) {
 
 // Получение информации по залам
 
-function hallOperations(data) {
+function hallsOperations(data) {
 
   for(let i = 0; i < data.result.halls.length; i++) {
 
     // Заполнение блока "Доступные залы"
 
-    listHalls.insertAdjacentHTML("beforeend", `
+    hallsList.insertAdjacentHTML("beforeend", `
       <li class="halls__list_item">
-        <span class="halls__list_name" data-id="${data.result.halls[i].id}">${data.result.halls[i].hall_name}</span> <span class="admin__button_remove hall_remove"></span>
+        <span class="halls__list_name" data-id="${data.result.halls[i].id}">${data.result.halls[i].hall_name}</span> <span class="admin__button_remove hall_remove"></span></p>
       </li>
     `);
 
     // Проверка наличия залов в списке
 
-    verifyHallsList();
+    checkHallsList();
 
     // Заполнение "Выберите зал для конфигурации" в блоке "Конфигурация залов"
 
-    listConfigHalls.insertAdjacentHTML("beforeend", `
+    hallsConfigList.insertAdjacentHTML("beforeend", `
       <li class="hall__item hall-config__item" data-id="${data.result.halls[i].id}">${data.result.halls[i].hall_name}</li>
     `);
 
     // Заполнение "Выберите зал для конфигурации" в блоке "Конфигурация цен"
 
-    listConfigPrices.insertAdjacentHTML("beforeend", `
+    priceConfigList.insertAdjacentHTML("beforeend", `
       <li class="hall__item price-config__item" data-id="${data.result.halls[i].id}">${data.result.halls[i].hall_name}</li>
     `);
 
     // Заполнение блока "Выберите зал для открытия/закрытия продаж"
 
-    listOpen.insertAdjacentHTML("beforeend", `
+    openList.insertAdjacentHTML("beforeend", `
     <li class="hall__item open__item" data-id="${data.result.halls[i].id}">${data.result.halls[i].hall_name}</li>
     `);
 
     // Создание таймлайнов залов в блоке "Сетка сеансов"
 
-    timelinesMovieSeances.insertAdjacentHTML("beforeend", `
+    movieSeancesTimelines.insertAdjacentHTML("beforeend", `
     <section class="movie-seances__timeline">
       <div class="timeline__delete">
          <img class="timeline__delete_image" src="./images/delete.png" alt="Удалить сеанс">
@@ -412,9 +412,9 @@ function hallOperations(data) {
 
     // Спрятать корзины
 
-    deleteTimeline = document.querySelectorAll(".timeline__delete");
+    timelineDelete = document.querySelectorAll(".timeline__delete");
 
-    deleteTimeline.forEach(element => {
+    timelineDelete.forEach(element => {
       element.classList.add("hidden");
     })
 
@@ -422,131 +422,131 @@ function hallOperations(data) {
 
   // Схема первого зала в списке 
 
-  listConfigHalls.firstElementChild.classList.add("hall_item-selected");
-  currentConfigHall = listConfigHalls.firstElementChild.getAttribute("data-id");
+  hallsConfigList.firstElementChild.classList.add("hall_item-selected");
+  currentHallConfig = hallsConfigList.firstElementChild.getAttribute("data-id");
 
-  formConfigHall = document.querySelector(".hall-config__size");
-  rowsConfigHall = document.querySelector(".hall-config__rows");
-  placesConfigHall = document.querySelector(".hall-config__places");
+  hallConfigForm = document.querySelector(".hall-config__size");
+  hallConfigRows = document.querySelector(".hall-config__rows");
+  hallConfigPlaces = document.querySelector(".hall-config__places");
 
-  schemeHall = document.querySelector(".hall-config__hall_wrapper");
+  hallScheme = document.querySelector(".hall-config__hall_wrapper");
 
-  currentIndexConfigHall = data.result.halls.findIndex(hall => hall.id === Number(currentConfigHall));
+  currentHallConfigIndex = data.result.halls.findIndex(hall => hall.id === Number(currentHallConfig));
 
-  rowsConfigHall.value = data.result.halls[currentIndexConfigHall].hall_rows;
-  placesConfigHall.value = data.result.halls[currentIndexConfigHall].hall_places;
+  hallConfigRows.value = data.result.halls[currentHallConfigIndex].hall_rows;
+  hallConfigPlaces.value = data.result.halls[currentHallConfigIndex].hall_places;
 
-  cancelConfigHall = document.querySelector(".hall-config__batton_cancel");
-  saveConfigHall = document.querySelector(".hall-config__batton_save");
+  hallConfigCancel = document.querySelector(".hall-config__batton_cancel");
+  hallConfigSave = document.querySelector(".hall-config__batton_save");
 
-  renderHall(data, currentIndexConfigHall);
-  modifyPlaces(rowsSchemeHall, data);
-  resizeHall(newArrayConfigHall, data);
+  showHall(data, currentHallConfigIndex);
+  changePlaces(hallSchemeRows, data);
+  changeHallSize(newHallConfigArray, data);
 
   // Клик по кнопке "Отмена" в блоке Конфигурация залов
 
-  cancelConfigHall.addEventListener("click", event => {
-    if(cancelConfigHall.classList.contains("button_disabled")) {
+  hallConfigCancel.addEventListener("click", event => {
+    if(hallConfigCancel.classList.contains("button_disabled")) {
       event.preventDefault();
     } else {
       event.preventDefault();
-      cancelConfigHall.classList.add("button_disabled");
-      saveConfigHall.classList.add("button_disabled");
+      hallConfigCancel.classList.add("button_disabled");
+      hallConfigSave.classList.add("button_disabled");
 
-      renderHall(data, currentIndexConfigHall);
-      modifyPlaces(rowsSchemeHall, data);
+      showHall(data, currentHallConfigIndex);
+      changePlaces(hallSchemeRows, data);
     }
   })
 
   // Клик по кнопке "Сохранить" в блоке Конфигурация залов
 
-  saveConfigHall.addEventListener("click", event => {
-    if(saveConfigHall.classList.contains("button_disabled")) {
+  hallConfigSave.addEventListener("click", event => {
+    if(hallConfigSave.classList.contains("button_disabled")) {
       event.preventDefault();
     } else {
       event.preventDefault();
-      saveHallConfig(currentConfigHall, newArrayConfigHall);
+      saveConfig(currentHallConfig, newHallConfigArray);
     }
   })
 
   // Загрузка цен для первого зала в списке 
 
-  listConfigPrices.firstElementChild.classList.add("hall_item-selected");
-  currentConfigPrice = listConfigPrices.firstElementChild.getAttribute("data-id");
+  priceConfigList.firstElementChild.classList.add("hall_item-selected");
+  currentPriceConfig = priceConfigList.firstElementChild.getAttribute("data-id");
 
-  formConfigPrices = document.querySelector(".price-config__form");
+  priceConfigForm = document.querySelector(".price-config__form");
 
-  standardConfigPrice = document.querySelector(".price-config__input_standart");
-  vipConfigPrice = document.querySelector(".price-config__input_vip");
+  priceConfigStandart = document.querySelector(".price-config__input_standart");
+  priceConfigVip = document.querySelector(".price-config__input_vip");
   
-  renderPrices(data, currentConfigPrice);
+  showPrices(data, currentPriceConfig);
 
   // Клик по кнопке "Отмена" в блоке Конфигурация цен
 
-  cancelConfigPrice = document.querySelector(".price-config__batton_cancel");
-  saveConfigPrice = document.querySelector(".price-config__batton_save");
+  priceConfigCancel = document.querySelector(".price-config__batton_cancel");
+  priceConfigSave = document.querySelector(".price-config__batton_save");
 
-  cancelConfigPrice.addEventListener("click", event => {
-    if(cancelConfigPrice.classList.contains("button_disabled")) {
+  priceConfigCancel.addEventListener("click", event => {
+    if(priceConfigCancel.classList.contains("button_disabled")) {
       event.preventDefault();
     } else {
       event.preventDefault();
-      cancelConfigPrice.classList.add("button_disabled");
-      saveConfigPrice.classList.add("button_disabled");
+      priceConfigCancel.classList.add("button_disabled");
+      priceConfigSave.classList.add("button_disabled");
 
-      renderPrices(data, currentConfigPrice)
+      showPrices(data, currentPriceConfig)
     }
   })
 
   // Клик по кнопке "Сохранить" в блоке Конфигурация цен
 
-  saveConfigPrice.addEventListener("click", event => {
-    if(saveConfigPrice.classList.contains("button_disabled")) {
+  priceConfigSave.addEventListener("click", event => {
+    if(priceConfigSave.classList.contains("button_disabled")) {
       event.preventDefault();
     } else {
-      saveHallPrices(currentConfigPrice);
+      savePrices(currentPriceConfig);
     }
   })
 
   // Проверка, открыт ли первый зал в списке 
 
-  listOpen.firstElementChild.classList.add("hall_item-selected");
-  currentOpen = listOpen.firstElementChild.getAttribute("data-id");
+  openList.firstElementChild.classList.add("hall_item-selected");
+  currentOpen = openList.firstElementChild.getAttribute("data-id");
 
-  verifyHallOpen(data, currentOpen);
+  checkHallOpen(data, currentOpen);
 
   // Выбор зала в блоке "Конфигурация залов"
 
-  itemsConfigHalls = document.querySelectorAll(".hall-config__item");
+  hallsConfigItems = document.querySelectorAll(".hall-config__item");
 
-  itemsConfigHalls.forEach(item => {
+  hallsConfigItems.forEach(item => {
     item.addEventListener("click", () => {
-      itemsConfigHalls.forEach(i => {
+      hallsConfigItems.forEach(i => {
         i.classList.remove("hall_item-selected");
       })
 
       item.classList.add("hall_item-selected");
 
       if(item.classList.contains("hall_item-selected")) {
-        currentConfigHall = item.getAttribute("data-id");
+        currentHallConfig = item.getAttribute("data-id");
       }
 
-      cancelConfigHall.classList.add("button_disabled");
-      saveConfigHall.classList.add("button_disabled");
+      hallConfigCancel.classList.add("button_disabled");
+      hallConfigSave.classList.add("button_disabled");
 
-      currentIndexConfigHall = data.result.halls.findIndex(hall => hall.id === Number(currentConfigHall));
+      currentHallConfigIndex = data.result.halls.findIndex(hall => hall.id === Number(currentHallConfig));
 
-      rowsConfigHall.value = data.result.halls[currentIndexConfigHall].hall_rows;
-      placesConfigHall.value = data.result.halls[currentIndexConfigHall].hall_places;
+      hallConfigRows.value = data.result.halls[currentHallConfigIndex].hall_rows;
+      hallConfigPlaces.value = data.result.halls[currentHallConfigIndex].hall_places;
 
       // Отрисовка зала
 
-      renderHall(data, currentIndexConfigHall);
-      modifyPlaces(rowsSchemeHall, data);
+      showHall(data, currentHallConfigIndex);
+      changePlaces(hallSchemeRows, data);
 
       // Изменение размера зала
 
-      resizeHall(newArrayConfigHall, data);
+      changeHallSize(newHallConfigArray, data);
 
     })
 
@@ -554,26 +554,26 @@ function hallOperations(data) {
 
   // Выбор зала в блоке "Конфигурация цен"
 
-  itemsConfigPrices = document.querySelectorAll(".price-config__item");
+  priceConfigItems = document.querySelectorAll(".price-config__item");
 
-  itemsConfigPrices.forEach(item => {
+  priceConfigItems.forEach(item => {
     item.addEventListener("click", () => {
-      itemsConfigPrices.forEach(i => {
+      priceConfigItems.forEach(i => {
         i.classList.remove("hall_item-selected");
       })
   
       item.classList.add("hall_item-selected");
 
       if(item.classList.contains("hall_item-selected")) {
-        currentConfigPrice = item.getAttribute("data-id");
+        currentPriceConfig = item.getAttribute("data-id");
       }
 
-      cancelConfigPrice.classList.add("button_disabled");
-      saveConfigPrice.classList.add("button_disabled");
+      priceConfigCancel.classList.add("button_disabled");
+      priceConfigSave.classList.add("button_disabled");
 
       // Отображение цены
 
-      renderPrices(data, currentConfigPrice);
+      showPrices(data, currentPriceConfig);
     })
 
   })
@@ -594,46 +594,46 @@ function hallOperations(data) {
         currentOpen = item.getAttribute("data-id");
       }
 
-      verifyHallOpen(data, currentOpen);
+      checkHallOpen(data, currentOpen);
     })
   }) 
 
   // Клик по кнопке в блоке "Открыть продажи"
 
-  buttonOpen.addEventListener("click", event => {
-    if(buttonOpen.classList.contains("button_disabled")) {
+  openButton.addEventListener("click", event => {
+    if(openButton.classList.contains("button_disabled")) {
       event.preventDefault();
     } else {
       event.preventDefault();
 
-      toggleHallOpen(currentOpen, statusNewHall);
+      openCloseHall(currentOpen, hallNewStatus);
 
       for(let i = 0; i < data.result.halls.length; i++) {
         if(data.result.halls[i].id === Number(currentOpen)) {
-          statusCurrentHall = data.result.halls[i].hall_open;
+          hallCurrentStatus = data.result.halls[i].hall_open;
         }
       }
     
-      if (statusNewHall === 0) {
-        buttonOpen.textContent = "Открыть продажу билетов";
-        infoOpen.textContent = "Всё готово к открытию";
-        statusNewHall = 1;
+      if (hallNewStatus === 0) {
+        openButton.textContent = "Открыть продажу билетов";
+        openInfo.textContent = "Всё готово к открытию";
+        hallNewStatus = 1;
       } else {
-        buttonOpen.textContent = "Приостановить продажу билетов";
-        infoOpen.textContent = "Зал открыт";
-        statusNewHall = 0;
+        openButton.textContent = "Приостановить продажу билетов";
+        openInfo.textContent = "Зал открыт";
+        hallNewStatus = 0;
       }
     }
   })
 
   // Удалить зал
 
-  buttonRemoveHall = document.querySelectorAll(".hall_remove");
+  hallRemoveButton = document.querySelectorAll(".hall_remove");
 
-  buttonRemoveHall.forEach(item => {
+  hallRemoveButton.forEach(item => {
     item.addEventListener("click", (e) => {
       let hallId = e.target.previousElementSibling.dataset.id;
-      removeHall(hallId);
+      deleteHall(hallId);
     })  
   })
 

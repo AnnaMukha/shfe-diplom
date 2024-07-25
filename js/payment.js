@@ -1,6 +1,7 @@
 const selectedSeanceId = Number(localStorage.getItem("seanceId"));
 const selectedDate = localStorage.getItem("checkedDate");
 const selectedTickets = JSON.parse(localStorage.getItem("tickets"));
+console.log(selectedTickets)
 
 const movieTitleElement = document.querySelector(".ticket__info-movie");
 const seatsElement = document.querySelector(".ticket__info-places");
@@ -27,10 +28,12 @@ function displayTicketInfo(data) {
 
   selectedTickets.forEach(ticket => {
     seatNumbers.push(ticket.row + "/" + ticket.place);
-    ticketPrices.push(ticket.coast);
+    ticketPrices.push(ticket.cost);
   });
 
   seatsElement.textContent = seatNumbers.join(", ");
+
+  console.log(ticketPrices)
 
   totalAmount = ticketPrices.reduce((acc, price) => acc + price, 0);
   totalPriceElement.textContent = totalAmount;
