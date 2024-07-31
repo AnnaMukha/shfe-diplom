@@ -1,84 +1,84 @@
-let currentSeanceId = Number(localStorage.getItem("seanceId"));
-let currentCheckedDate = localStorage.getItem("checkedDate");
+let idSeansa = Number(localStorage.getItem("seanceId"));
+let proverennayaData = localStorage.getItem("checkedDate");
 
-const bodyElement = document.querySelector("body");
-const infoSection = document.querySelector(".buying__info");
+const telo = document.querySelector("body");
+const informaciyaPokupki = document.querySelector(".buying__info");
 
-const titleMovie = document.querySelector(".buying__info_title");
-const startTimeSeance = document.querySelector(".buying__info-time");
-const nameHall = document.querySelector(".buying__info_hall");
+const nazvanieFilma = document.querySelector(".buying__info_title");
+const vremyaNachalaSeansa = document.querySelector(".buying__info-time");
+const nazvanieZala = document.querySelector(".buying__info_hall");
 
-const seatScheme = document.querySelector(".buying__scheme_places");
-let hallRowsScheme;
-let seatsInHall;
+const skhema = document.querySelector(".buying__scheme_places");
+let strokiSkhemaZala;
+let kreslaZala;
 
-const standardPriceElement = document.querySelector(".price_standart");
-const vipPriceElement = document.querySelector(".price_vip");
-let priceStandard;
-let priceVip;
+const cenaStandartZala = document.querySelector(".price_standart");
+const cenaVipZala = document.querySelector(".price_vip");
+let cenaStandart;
+let cenaVip;
 
-let selectedSeats;
-let ticketList = [];
-let totalCost;
+let vybrannyeMesta;
+let bilety = [];
+let stoimost;
 
-const bookButton = document.querySelector(".buying__button");
+const knopkaPokupki = document.querySelector(".buying__button");
 
 // Увеличение экрана при двойном тапе на мобильных устройствах
 
-bodyElement.addEventListener("dblclick", () => {
-  if ((Number(bodyElement.getBoundingClientRect().width)) < 1200) {
-    if (bodyElement.getAttribute("transformed") === "false" || !bodyElement.hasAttribute("transformed")) {
-      bodyElement.style.zoom = "1.5";
-      bodyElement.style.transform = "scale(1.5)";
-      bodyElement.style.transformOrigin = "0 0";
-      bodyElement.setAttribute("transformed", "true");
-    } else if (bodyElement.getAttribute("transformed") === "true") {
-      bodyElement.style.zoom = "1";
-      bodyElement.style.transform = "scale(1)";
-      bodyElement.style.transformOrigin = "0 0";
-      bodyElement.setAttribute("transformed", "false");
+telo.addEventListener("dblclick", () => {
+  if((Number(telo.getBoundingClientRect().width)) < 1200) {
+    if(telo.getAttribute("transformed") === "false" || !telo.hasAttribute("transformed")) {
+      telo.style.zoom = "1.5";
+      telo.style.transform = "scale(1.5)";
+      telo.style.transformOrigin = "0 0";
+      telo.setAttribute("transformed", "true")
+    } else if(telo.getAttribute("transformed") === "true") {
+      telo.style.zoom = "1";
+      telo.style.transform = "scale(1)";
+      telo.style.transformOrigin = "0 0";
+      telo.setAttribute("transformed", "false");
     }
   }
-});
+})
 
 // Отображение данных о фильме, сеансе и зале
 
-function displayInfo(data) {
-  let seanceIndex = data.result.seances.findIndex(item => item.id === Number(currentSeanceId));
-  let movieIndex = data.result.films.findIndex(item => item.id === data.result.seances[seanceIndex].seance_filmid);
-  let hallIndex = data.result.halls.findIndex(item => item.id === data.result.seances[seanceIndex].seance_hallid);
+function ustanovitInformaciyu(data) {
+  let indexSeansa = data.result.seances.findIndex(item => item.id === Number(idSeansa));
+  let indexFilma = data.result.films.findIndex(item => item.id === data.result.seances[indexSeansa].seance_filmid);
+  let indexZala = data.result.halls.findIndex(item => item.id === data.result.seances[indexSeansa].seance_hallid);
 
-  titleMovie.textContent = data.result.films[movieIndex].film_name;
-  startTimeSeance.textContent = data.result.seances[seanceIndex].seance_time;
-  nameHall.textContent = data.result.halls[hallIndex].hall_name;
+  nazvanieFilma.textContent = data.result.films[indexFilma].film_name;
+  vremyaNachalaSeansa.textContent = data.result.seances[indexSeansa].seance_time;
+  nazvanieZala.textContent = data.result.halls[indexZala].hall_name;
 
-  standardPriceElement.textContent = data.result.halls[hallIndex].hall_price_standart;
-  vipPriceElement.textContent = data.result.halls[hallIndex].hall_price_vip;
+  cenaStandartZala.textContent = data.result.halls[indexZala].hall_price_standart;
+  cenaVipZala.textContent = data.result.halls[indexZala].hall_price_vip;
 
-  priceStandard = data.result.halls[hallIndex].hall_price_standart;
-  priceVip = data.result.halls[hallIndex].hall_price_vip;
+  cenaStandart = data.result.halls[indexZala].hall_price_standart;
+  cenaVip = data.result.halls[indexZala].hall_price_vip;
 }
 
 // Отображение данных о схеме зала
 
-function renderHallScheme(data) {
-  let hallConfiguration = data.result;
+function pokazatSkhemuZala(data) {
+  let konfiguraciyaZala = data.result;
 
-  hallConfiguration.forEach(() => {
-    seatScheme.insertAdjacentHTML("beforeend", `<div class="buying__scheme_row"></div>`);
+  konfiguraciyaZala.forEach(() => {
+    skhema.insertAdjacentHTML("beforeend", `<div class="buying__scheme_row"></div>`);
   });
+    
+  strokiSkhemaZala = document.querySelectorAll(".buying__scheme_row");
 
-  hallRowsScheme = document.querySelectorAll(".buying__scheme_row");
-
-  for (let i = 0; i < hallRowsScheme.length; i++) {
-    for (let j = 0; j < hallConfiguration[i].length; j++) {
-      hallRowsScheme[i].insertAdjacentHTML("beforeend", `<span class="buying__scheme_chair" data-type="${hallConfiguration[i][j]}"></span>`);
+  for(let i = 0; i < strokiSkhemaZala.length; i++) {
+    for(let j = 0; j < konfiguraciyaZala[i].length; j++) {
+      strokiSkhemaZala[i].insertAdjacentHTML("beforeend", `<span class="buying__scheme_chair" data-type="${konfiguraciyaZala[i][j]}"></span>`);
     }
   }
 
-  seatsInHall = document.querySelectorAll(".buying__scheme_chair");
+  kreslaZala = document.querySelectorAll(".buying__scheme_chair");
 
-  seatsInHall.forEach(element => {
+  kreslaZala.forEach(element => {
     if (element.dataset.type === "vip") {
       element.classList.add("chair_vip");
     } else if (element.dataset.type === "standart") {
@@ -88,95 +88,103 @@ function renderHallScheme(data) {
     } else {
       element.classList.add("no-chair");
     }
-  });
+  })
+
 }
 
 // Выбор мест
 
-function selectSeats(hallRowsScheme) {
-  let hallSelectRows = Array.from(hallRowsScheme);
-  hallSelectRows.forEach(row => {
-    let hallSelectPlaces = Array.from(row.children);
-    hallSelectPlaces.forEach(place => {
-      if (place.dataset.type !== "disabled" && place.dataset.type !== "taken") {
+function vybratMesta(strokiSkhemaZala) {
+  let vybrannyeStroki = Array.from(strokiSkhemaZala);
+  vybrannyeStroki.forEach(row => {
+    let vybrannyeMesta = Array.from(row.children);
+    vybrannyeMesta.forEach(place => {   
+      if(place.dataset.type !== "disabled" && place.dataset.type !== "taken") {
         place.addEventListener("click", () => {
           place.classList.toggle("chair_selected");
 
-          selectedSeats = document.querySelectorAll(".chair_selected:not(.buying__scheme_legend-chair)");
+          vybrannyeMesta = document.querySelectorAll(".chair_selected:not(.buying__scheme_legend-chair)");
 
           // Активация кнопки "Забронировать"
 
-          if (selectedSeats.length === 0) {
-            bookButton.classList.add("buying__button_disabled");
+          if (vybrannyeMesta.length === 0) {
+            knopkaPokupki.classList.add("buying__button_disabled");
           } else {
-            bookButton.classList.remove("buying__button_disabled");
+            knopkaPokupki.classList.remove("buying__button_disabled");
           }
-        });
+        })
+
       }
-    });
-  });
+    })
+  })  
 }
 
 // Клик по кнопке "Забронировать"
 
-function handleBookingButton() {
-  bookButton.addEventListener("click", event => {
+function klikKnopkiBronirovaniya() {
+  knopkaPokupki.addEventListener("click", event => {
     event.preventDefault();
 
-    if (bookButton.classList.contains("buying__button_disabled")) {
+    if(knopkaPokupki.classList.contains("buying__button_disabled")) {
       return;
     } else {
-      let hallSelectedRows = Array.from(document.querySelectorAll(".buying__scheme_row"));
 
-      ticketList = [];
+      let vybrannyeStroki = Array.from(document.querySelectorAll(".buying__scheme_row"));
 
-      hallSelectedRows.forEach(row => {
-        let rowIndex = hallSelectedRows.findIndex(currentRow => currentRow === row);
+      bilety = [];
 
-        let hallSelectedPlaces = Array.from(row.children);
+      vybrannyeStroki.forEach(row => {
+        let indexStroki = vybrannyeStroki.findIndex(currentRow => currentRow === row);
+       
+        let vybrannyeMesta = Array.from(row.children);
 
-        hallSelectedPlaces.forEach(place => {
-          let placeIndex = hallSelectedPlaces.findIndex(currentPlace => currentPlace === place);
+        vybrannyeMesta.forEach(place => {
+          let indexMesta = vybrannyeMesta.findIndex(currentPlace => currentPlace === place);
 
-          if (place.classList.contains("chair_selected")) {
-            if (place.dataset.type === "standart") {
-              totalCost = priceStandard;
-            } else if (place.dataset.type === "vip") {
-              totalCost = priceVip;
+          if(place.classList.contains("chair_selected")) {
+            if(place.dataset.type === "standart") {
+              stoimost = cenaStandart;
+            } else if(place.dataset.type === "vip") {
+              stoimost = cenaVip;
             }
 
-            ticketList.push({
-              row: rowIndex + 1,
-              place: placeIndex + 1,
-              cost: totalCost,
-            });
+            bilety.push({
+              row: indexStroki + 1,
+              place: indexMesta + 1,
+              coast: stoimost,
+            })
           }
-        });
-      });
 
-      localStorage.setItem("tickets", JSON.stringify(ticketList));
+        })
+      })
 
-      document.location = "./payment.html";
+      localStorage.setItem("tickets", JSON.stringify(bilety));
+
+      document.location="./payment.html";
     }
-  });
+
+  })
+
 }
 
-// Получение общих данных с сервера
+
+// Получение общих данные с сервера
 
 fetch("https://shfe-diplom.neto-server.ru/alldata")
   .then(response => response.json())
-  .then(function (data) {
+  .then(function(data) {
     console.log(data);
-    displayInfo(data);
+    ustanovitInformaciyu(data);
 
     // Получение данных о схеме зала
 
-    fetch(`https://shfe-diplom.neto-server.ru/hallconfig?seanceId=${currentSeanceId}&date=${currentCheckedDate}`)
-      .then(response => response.json())
-      .then(function (data) {
-        console.log(data);
-        renderHallScheme(data);
-        selectSeats(hallRowsScheme);
-        handleBookingButton();
-      });
-  });
+    fetch(`https://shfe-diplom.neto-server.ru/hallconfig?seanceId=${idSeansa}&date=${proverennayaData}`)
+    .then(response => response.json())
+    .then(function(data) {
+      console.log(data);
+      pokazatSkhemuZala(data);
+      vybratMesta(strokiSkhemaZala);
+      klikKnopkiBronirovaniya();
+    })
+
+  })

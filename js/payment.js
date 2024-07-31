@@ -1,77 +1,74 @@
-const selectedSeanceId = Number(localStorage.getItem("seanceId"));
-const selectedDate = localStorage.getItem("checkedDate");
-const selectedTickets = JSON.parse(localStorage.getItem("tickets"));
-console.log(selectedTickets)
+const idSeansa = Number(localStorage.getItem("seanceId"));
+const proverennayaData = localStorage.getItem("checkedDate");
+const bilety = JSON.parse(localStorage.getItem("tickets"));
 
-const movieTitleElement = document.querySelector(".ticket__info-movie");
-const seatsElement = document.querySelector(".ticket__info-places");
-const hallNameElement = document.querySelector(".ticket__info-hall");
-const seanceTimeElement = document.querySelector(".ticket__info-time");
-const totalPriceElement = document.querySelector(".ticket__info-price");
+const informaciyaFilma = document.querySelector(".ticket__info-movie");
+const informaciyaMest = document.querySelector(".ticket__info-places");
+const informaciyaZala = document.querySelector(".ticket__info-hall");
+const informaciyaVremeni = document.querySelector(".ticket__info-time");
+const informaciyaStoimosti = document.querySelector(".ticket__info-price");
 
-let seatNumbers = [];
-let ticketPrices = [];
-let totalAmount;
+let mesta = [];
+let stoimost = [];
+let konechnayaSumma;
 
-const bookButton = document.querySelector(".ticket__button");
+const knopkaBileta = document.querySelector(".ticket__button");
 
 // Отображение данных о билете
 
-function displayTicketInfo(data) {
-  let seanceIndex = data.result.seances.findIndex(item => item.id === Number(selectedSeanceId));
-  let movieIndex = data.result.films.findIndex(item => item.id === data.result.seances[seanceIndex].seance_filmid);
-  let hallIndex = data.result.halls.findIndex(item => item.id === data.result.seances[seanceIndex].seance_hallid);
+function poluchitInformaciyu(data) {
+  let indexSeansa = data.result.seances.findIndex(item => item.id === Number(idSeansa));
+  let indexFilma = data.result.films.findIndex(item => item.id === data.result.seances[indexSeansa].seance_filmid);
+  let indexZala = data.result.halls.findIndex(item => item.id === data.result.seances[indexSeansa].seance_hallid);
 
-  movieTitleElement.textContent = data.result.films[movieIndex].film_name;
-  hallNameElement.textContent = data.result.halls[hallIndex].hall_name;
-  seanceTimeElement.textContent = data.result.seances[seanceIndex].seance_time;
+  informaciyaFilma.textContent = data.result.films[indexFilma].film_name;
+  informaciyaZala.textContent = data.result.halls[indexZala].hall_name;
+  informaciyaVremeni.textContent = data.result.seances[indexSeansa].seance_time;
 
-  selectedTickets.forEach(ticket => {
-    seatNumbers.push(ticket.row + "/" + ticket.place);
-    ticketPrices.push(ticket.cost);
-  });
+  bilety.forEach(ticket => {
+    mesta.push(ticket.row + "/" + ticket.place);
+    stoimost.push(ticket.coast);
+  })
 
-  seatsElement.textContent = seatNumbers.join(", ");
+  informaciyaMest.textContent = mesta.join(", ");
 
-  console.log(ticketPrices)
-
-  totalAmount = ticketPrices.reduce((acc, price) => acc + price, 0);
-  totalPriceElement.textContent = totalAmount;
+  konechnayaSumma = stoimost.reduce((acc, price) => acc + price, 0);
+  informaciyaStoimosti.textContent = konechnayaSumma;
 }
 
 // Запрос к серверу (информация по фильму, залу и сеансу)
 
 fetch("https://shfe-diplom.neto-server.ru/alldata")
   .then(response => response.json())
-  .then(function (data) {
+  .then(function(data) {
     console.log(data);
-    displayTicketInfo(data);
-  });
+    poluchitInformaciyu(data);
+  })
 
 // Клик по кнопке "Получить код бронирования"
 
-bookButton.addEventListener("click", event => {
+knopkaBileta.addEventListener("click", event => {
   event.preventDefault();
 
   const params = new FormData();
-  params.set("seanceId", selectedSeanceId);
-  params.set("ticketDate", selectedDate);
-  params.set("tickets", JSON.stringify(selectedTickets));
-
-  fetch("https://shfe-diplom.neto-server.ru/ticket", {
-    method: "POST",
-    body: params
-  })
-    .then(response => response.json())
-    .then(function (data) {
-      console.log(data);
-
-      if (data.success === true) {
-        localStorage.setItem("ticketsInfo", JSON.stringify(data));
-        document.location = "./ticket.html";
-      } else {
-        alert("Места недоступны для бронирования!");
-        return;
-      }
-    });
-});
+    params.set("seanceId", idSeansa);
+    params.set("ticketDate", proverennayaData);
+    params.set("tickets", JSON.stringify(bilety));
+  
+    fetch("https://shfe-diplom.neto-server.ru/ticket", {
+      method: "POST",
+      body: params
+      })
+      .then(response => response.json())
+      .then(function(data) {
+        console.log(data); 
+        
+        if(data.success === true) { 
+          localStorage.setItem("ticketsInfo", JSON.stringify(data));
+          document.location="./ticket.html";
+        } else {
+          alert("Места недоступны для бронирования!");
+          return;
+        }
+    })  
+})

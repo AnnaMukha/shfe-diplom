@@ -1,69 +1,69 @@
-const btnLogin = document.querySelector(".header__button");
+const knopkaVkhoda = document.querySelector(".header__button");
 
-const daysNav = Array.from(document.querySelectorAll(".nav__day"));
-const todayNav = document.querySelector(".nav__day_today");
-const rightNavArrow = document.querySelector(".right");
+const dniNavigacii = Array.from(document.querySelectorAll(".nav__day"));
+const navigaciyaSegodnya = document.querySelector(".nav__day_today");
+const strelkaNavigaciiVpravo = document.querySelector(".right");
 
-let counterDays = 1;
+let kolichestvoDney = 1;
 
-let todayWeekdayNav;
-let todayDateNav;
+let tekushayaNedelyaNavigacii;
+let tekushayaDataNavigacii;
 
-const weekdays = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
-let weekdayToday;
+const dniNedeli = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+let segodnyaDenNedeli;
 
-const currentDate = new Date();
-let chosenDate;
-let dateSelected;
-let monthSelected;
-let yearSelected;
+const tekushiyDen = new Date();
+let proverennayaData;
+let vybrannayaData;
+let vybrannyyMesyac;
+let vybrannyyGod;
 
-let formattedDate;
-let formattedMonth;
-let fullDate;
+let poluchennayaData;
+let poluchennyyMesyac;
+let data;
 
-let sortedNavDays;
+let otsortirovannyeDniNavigacii;
 
-const mainSection = document.querySelector(".main");
-let filmList;
-let individualFilm;
-let filmSeances;
-let seanceList;
+const osnova = document.querySelector(".main");
+let filmy;
+let film;
+let seansyFilma;
+let spisokSeansovFilma;
 
 // Переход на авторизацию с кнопки "Войти"
 
-btnLogin.addEventListener("click", event => {
+knopkaVkhoda.addEventListener("click", event => {
   event.preventDefault();
-  document.location = "./admin-login.html";
-});
+  document.location="./admin-login.html";
+})
 
 // Установка даты и дня недели сегодняшнего дня
 
-function setTodayDate(currentDate) {
-  weekdayToday = weekdays[currentDate.getDay()];
+function ustanovitSegodnya(tekushiyDen) {
+  segodnyaDenNedeli = dniNedeli[tekushiyDen.getDay()];
 
-  todayWeekdayNav = todayNav.querySelector(".nav__text-week");
-  todayWeekdayNav.textContent = `${weekdayToday}, `;
-
-  todayDateNav = todayNav.querySelector(".nav__text-date");
-  todayDateNav.textContent = ` ${currentDate.getDate()}`;
-
-  if (todayWeekdayNav.textContent === "Сб, " || todayWeekdayNav.textContent === "Вс, ") {
-    todayWeekdayNav.classList.add("nav__day_weekend");
-    todayDateNav.classList.add("nav__day_weekend");
+  tekushayaNedelyaNavigacii = navigaciyaSegodnya.querySelector(".nav__text-week");
+  tekushayaNedelyaNavigacii.textContent = `${segodnyaDenNedeli}, `;
+  
+  tekushayaDataNavigacii = navigaciyaSegodnya.querySelector(".nav__text-date");
+  tekushayaDataNavigacii.textContent = ` ${tekushiyDen.getDate()}`;
+  
+  if (tekushayaNedelyaNavigacii.textContent === "Сб, " || tekushayaNedelyaNavigacii.textContent === "Вс, ") {
+    tekushayaNedelyaNavigacii.classList.add("nav__day_weekend");
+    tekushayaDataNavigacii.classList.add("nav__day_weekend");
   }
 }
 
 // Установка дат и дней недели на остальные дни
 
-function initializeDays() {
-  daysNav.forEach((day, i) => {
-    if (!day.classList.contains("nav__day_today") && !day.classList.contains("nav__arrow")) {
-      const date = new Date(currentDate.getTime() + (1000 * 60 * 60 * 24 * i));
+function ustanovitDni() {
+  dniNavigacii.forEach((day, i) => {
+    if(!day.classList.contains("nav__day_today") && !day.classList.contains("nav__arrow")) {
+      const date = new Date(tekushiyDen.getTime() + (1000 * 60 * 60 * 24 * i));
       day.dataset.date = date.toJSON().split("T")[0];
-      day.firstElementChild.textContent = `${weekdays[date.getDay()]},`;
+      day.firstElementChild.textContent = `${dniNedeli[date.getDay()]},`;
       day.lastElementChild.textContent = date.getDate();
-
+  
       if (day.firstElementChild.textContent === "Сб," || day.firstElementChild.textContent === "Вс,") {
         day.classList.add("nav__day_weekend");
       } else {
@@ -75,14 +75,14 @@ function initializeDays() {
 
 // Смена дней недели и дат
 
-function updateDays(daysCount) {
-  daysNav.forEach((day, i) => {
-    if (!day.classList.contains("nav__day_today") && !day.classList.contains("nav__arrow")) {
-      const date = new Date(currentDate.getTime() + (1000 * 60 * 60 * 24 * (i + daysCount)));
+function smenaDney(kolichestvoDney) {
+  dniNavigacii.forEach((day, i) => {
+    if(!day.classList.contains("nav__day_today") && !day.classList.contains("nav__arrow")) {
+      const date = new Date(tekushiyDen.getTime() + (1000 * 60 * 60 * 24 * (i + kolichestvoDney)));
       day.dataset.date = date.toJSON().split("T")[0];
-      day.firstElementChild.textContent = `${weekdays[date.getDay()]},`;
+      day.firstElementChild.textContent = `${dniNedeli[date.getDay()]},`;
       day.lastElementChild.textContent = date.getDate();
-
+  
       if (day.firstElementChild.textContent === "Сб," || day.firstElementChild.textContent === "Вс,") {
         day.classList.add("nav__day_weekend");
       } else {
@@ -94,182 +94,207 @@ function updateDays(daysCount) {
 
 // Преобразование выбранной даты для параметров
 
-function formatDate(selectedDate, selectedMonth, selectedYear) {
-  formattedDate = selectedDate < 10 ? `0${selectedDate}` : selectedDate;
-  formattedMonth = selectedMonth < 9 ? `0${selectedMonth + 1}` : selectedMonth + 1;
-  fullDate = `${selectedYear}-${formattedMonth}-${formattedDate}`;
+function poluchitDen(vybrannayaData, vybrannyyMesyac, vybrannyyGod) {
+  if(vybrannayaData < 10) {
+    poluchennayaData = `0${vybrannayaData}`;
+  } else {
+    poluchennayaData = vybrannayaData;
+  }
+
+  if(vybrannyyMesyac < 9) {
+    poluchennyyMesyac = `0${vybrannyyMesyac}`;
+  } else {
+    searchMonth = poluchennyyMesyac;
+  }
+
+  data = `${vybrannyyGod}-${poluchennyyMesyac}-${poluchennayaData}`;
 }
 
 // Сортировка списка дней (избавление от кнопок со стрелками)
 
-function filterDays(navDays) {
-  sortedNavDays = navDays.filter(item => !item.classList.contains("nav__arrow"));
+function sortirovkaDney(dniNavigacii) {
+  otsortirovannyeDniNavigacii = dniNavigacii.filter(item => !item.classList.contains("nav__arrow"));
 }
 
 // Выделение сегодняшнего дня
 
-todayNav.classList.add("nav__day-checked");
-todayNav.style.cursor = "default";
-todayNav.dataset.date = currentDate.toJSON().split("T")[0];
+navigaciyaSegodnya.classList.add("nav__day-checked");
+navigaciyaSegodnya.style.cursor = "default";
+navigaciyaSegodnya.dataset.date = tekushiyDen.toJSON().split("T")[0];
 
-if (todayNav.classList.contains("nav__day-checked")) {
-  dateSelected = currentDate.getDate();
-  monthSelected = currentDate.getMonth();
-  yearSelected = currentDate.getFullYear();
+if(navigaciyaSegodnya.classList.contains("nav__day-checked")) {
+  vybrannayaData = tekushiyDen.getDate();
+  vybrannyyMesyac = tekushiyDen.getMonth() + 1;
+  vybrannyyGod = tekushiyDen.getFullYear();
 
-  formatDate(dateSelected, monthSelected, yearSelected);
-  localStorage.setItem("checkedDate", fullDate);
+  poluchitDen(vybrannayaData, vybrannyyMesyac, vybrannyyGod);
+  localStorage.setItem("checkedDate", data);
 }
 
-setTodayDate(currentDate);
-initializeDays();
-filterDays(daysNav);
-highlightPastSeances();
+ustanovitSegodnya(tekushiyDen);
+ustanovitDni();
+sortirovkaDney(dniNavigacii);
+otmetitProshlyeSeansy();
 
 // При нажатии на правую стрелку
 
-rightNavArrow.addEventListener("click", () => {
-  counterDays++;
+strelkaNavigaciiVpravo.addEventListener("click", () => {
+  kolichestvoDney++;
+  
+  navigaciyaSegodnya.classList.remove("nav__day-checked");
+  navigaciyaSegodnya.classList.add("nav__arrow");
+  navigaciyaSegodnya.classList.add("left");
+  navigaciyaSegodnya.style.cursor = "pointer";
+  navigaciyaSegodnya.style.display = "flex";
 
-  todayNav.classList.remove("nav__day-checked");
-  todayNav.classList.add("nav__arrow");
-  todayNav.classList.add("left");
-  todayNav.style.cursor = "pointer";
-  todayNav.style.display = "flex";
-
-  todayNav.innerHTML = `
+  navigaciyaSegodnya.innerHTML = `
     <span class="nav__arrow-text">&lt;</span>
   `;
 
-  updateDays(counterDays);
-  filterDays(daysNav);
-});
+  smenaDney(kolichestvoDney);
+  sortirovkaDney(dniNavigacii);
+})
 
 // При нажатии на левую стрелку
 
-todayNav.addEventListener("click", () => {
-  if (todayNav.classList.contains("nav__arrow")) {
-    counterDays--;
+navigaciyaSegodnya.addEventListener("click", () => {
+  if(navigaciyaSegodnya.classList.contains("nav__arrow")) {
+    kolichestvoDney--;
 
-    if (counterDays > 0) {
-      updateDays(counterDays);
-      filterDays(daysNav);
-    } else if (counterDays === 0) {
-      todayNav.classList.remove("nav__arrow");
-      todayNav.classList.remove("left");
-      todayNav.style.display = "block";
-
-      todayNav.innerHTML = `
+    if(kolichestvoDney > 0) {
+      smenaDney(kolichestvoDney);
+      sortirovkaDney(dniNavigacii);
+    } else if (kolichestvoDney === 0) {
+      navigaciyaSegodnya.classList.remove("nav__arrow");
+      navigaciyaSegodnya.classList.remove("left");
+      navigaciyaSegodnya.style.display = "block";
+    
+      navigaciyaSegodnya.innerHTML = `
         <span class="nav__text-today">Сегодня</span>
         <br><span class="nav__text-week"></span> <span class="nav__text-date"></span>
       `;
+  
+      ustanovitSegodnya(tekushiyDen);
+      ustanovitDni();
 
-      setTodayDate(currentDate);
-      initializeDays();
+      dniNavigacii.forEach(day => {
+        if(!day.classList.contains("nav__day-checked")) {
+          navigaciyaSegodnya.classList.add("nav__day-checked");
+          navigaciyaSegodnya.style.cursor = "default";
 
-      daysNav.forEach(day => {
-        if (!day.classList.contains("nav__day-checked")) {
-          todayNav.classList.add("nav__day-checked");
-          todayNav.style.cursor = "default";
-
-          dateSelected = currentDate.getDate();
-          monthSelected = currentDate.getMonth();
-          yearSelected = currentDate.getFullYear();
-
-          formatDate(dateSelected, monthSelected, yearSelected);
-          localStorage.setItem("checkedDate", fullDate);
+          vybrannayaData = tekushiyDen.getDate();
+          vybrannyyMesyac = tekushiyDen.getMonth() + 1;
+          vybrannyyGod = tekushiyDen.getFullYear();
+        
+          poluchitDen(vybrannayaData, vybrannyyMesyac, vybrannyyGod);
+          localStorage.setItem("checkedDate", data);
         }
-      });
-
-      filterDays(daysNav);
+      })
+  
+      sortirovkaDney(dniNavigacii);
     } else {
       return;
     }
+
   } else {
     return;
   }
-});
+  
+})
 
 // Выбор дня
 
-sortedNavDays.forEach(day => {
+otsortirovannyeDniNavigacii.forEach(day => {
   day.addEventListener("click", () => {
-    sortedNavDays.forEach(item => {
+
+    otsortirovannyeDniNavigacii.forEach(item => {
       item.classList.remove("nav__day-checked");
       item.style.cursor = "pointer";
-    });
+    })
 
-    if (!day.classList.contains("nav__arrow")) {
+    if(!day.classList.contains("nav__arrow")) {
       day.classList.add("nav__day-checked");
       day.style.cursor = "default";
 
-      chosenDate = new Date(day.dataset.date);
+      proverennayaData = new Date(day.dataset.date);
 
-      dateSelected = chosenDate.getDate();
-      monthSelected = chosenDate.getMonth();
-      yearSelected = chosenDate.getFullYear();
+      vybrannayaData = proverennayaData.getDate();
+      vybrannyyMesyac = proverennayaData.getMonth() + 1;
+      vybrannyyGod = proverennayaData.getFullYear();
+        
+      poluchitDen(vybrannayaData, vybrannyyMesyac, vybrannyyGod);
+      localStorage.setItem("checkedDate", data);
 
-      formatDate(dateSelected, monthSelected, yearSelected);
-      localStorage.setItem("checkedDate", fullDate);
-
-      highlightPastSeances();
-      handleSeanceClick();
+      otmetitProshlyeSeansy();
+      klikSeansa();
     }
-  });
-});
+    
+  })
+})
 
 // Формирование списка фильмов и сеансов по ним
 
-let filmData;
-let seanceData;
-let hallData;
+let dannyeFilmy;
+let dannyeSeansy;
+let dannyeZaly;
 
-let hallSeanceData;
-let currentSeanceList;
+let seansyZalov;
+let tekushieSeansy;
 
-function displayMovies(data) {
-  filmData = data.result.films;
-  seanceData = data.result.seances;
-  hallData = data.result.halls.filter(hall => hall.hall_open === 1);
+function poluchitFilmy(data) {
+  dannyeFilmy = data.result.films;
+  dannyeSeansy = data.result.seances;
+  dannyeZaly = data.result.halls.filter(hall => hall.hall_open === 1);
 
-  filmData.forEach(film => {
-    hallSeanceData = "";
+  dannyeFilmy.forEach(film => {
+    seansyZalov = "";
 
-    hallData.forEach(hall => {
-      // Фильтрация по сеансам в холлах, где показывается фильм
-      currentSeanceList = seanceData.filter(seance => (
-        (Number(seance.seance_hallid) === Number(hall.id)) &&
+    dannyeZaly.forEach(hall => {
+
+      //Фильтрация по сеансам в холлах, где показывается фильм
+
+      tekushieSeansy = dannyeSeansy.filter(seance => (
+        (Number(seance.seance_hallid) === Number(hall.id)) && 
         (Number(seance.seance_filmid) === Number(film.id))
       ));
 
       // Сортировка полученного массива по времени сеансов
-      currentSeanceList.sort((a, b) => {
-        return (a.seance_time.slice(0, 2) - b.seance_time.slice(0, 2));
+
+      tekushieSeansy.sort(function(a, b) {
+        if ((a.seance_time.slice(0,2) - b.seance_time.slice(0,2)) < 0) {
+          return -1;
+        } else if ((a.seance_time.slice(0,2) - b.seance_time.slice(0,2)) > 0) {
+          return 1;
+        }
       });
 
-      if (currentSeanceList.length > 0) {
+      if (tekushieSeansy.length > 0) {
+
         // Формирование названия зала и списка для сеансов
-        hallSeanceData += `
+
+        seansyZalov += `
         <h3 class="movie-seances__hall" data-hallid="${hall.id}">${hall.hall_name}</h3>
         <ul class="movie-seances__list">
         `;
 
-        currentSeanceList.forEach(seance => {
+        tekushieSeansy.forEach(seance => {
           // Формирование сеансов для нужного зала
-          hallSeanceData += `
+
+          seansyZalov += `
           <li class="movie-seances__time" data-seanceid="${seance.id}" data-hallid="${hall.id}" data-filmid="${film.id}">
             ${seance.seance_time}
           </li>
           `;
         });
-
-        hallSeanceData += `</ul>`;
-      }
+        
+        seansyZalov += `</ul>`;
+      };
     });
-
-    if (hallSeanceData) {
+  
+    if (seansyZalov) {
       // Формирование блока с фильмом
-      mainSection.insertAdjacentHTML("beforeend", `
+
+      osnova.insertAdjacentHTML("beforeend", `
         <section class="movie" data-filmid="${film.id}">
           <div class="movie__info">
             <div class="movie__poster">
@@ -286,68 +311,76 @@ function displayMovies(data) {
           </div>
 
           <div class="movie-seances">
-            ${hallSeanceData}
+            ${seansyZalov}
           </div>
         </section>
       `);
-    }
-  });
+    } 
+  })
 
-  highlightPastSeances();
-  handleSeanceClick();
+  otmetitProshlyeSeansy();
+
+  klikSeansa();
 }
 
 // Запрос данных с сервера
 
 fetch("https://shfe-diplom.neto-server.ru/alldata")
   .then(response => response.json())
-  .then(function (data) {
+  .then(function(data) {
     console.log(data);
-    displayMovies(data);
-  });
+    poluchitFilmy(data);
+  })
 
 // Отмечание прошедших сеансов неактивными
 
-function highlightPastSeances() {
-  // Получение текущего времени (часы:минуты)
-  const currentHours = currentDate.getHours();
-  const currentMinutes = currentDate.getMinutes();
+function otmetitProshlyeSeansy() {
 
-  seanceList = document.querySelectorAll(".movie-seances__time");
-  seanceList.forEach(seance => {
-    if (Number(dateSelected) === Number(currentDate.getDate())) {
-      if (Number(currentHours) > Number(seance.textContent.trim().slice(0, 2))) {
+  // Получение текущего времени (часы:минуты)
+
+  const tekushieChasy = tekushiyDen.getHours();
+  const tekushieMinuty = tekushiyDen.getMinutes();
+
+  spisokSeansovFilma = document.querySelectorAll(".movie-seances__time");
+  spisokSeansovFilma.forEach(seance => {
+
+    if (Number(vybrannayaData) === Number(tekushiyDen.getDate())) {
+   
+      if(Number(tekushieChasy) > Number(seance.textContent.trim().slice(0,2))) {
         seance.classList.add("movie-seances__time_disabled");
-      } else if (Number(currentHours) === Number(seance.textContent.trim().slice(0, 2))) {
-        if (Number(currentMinutes) > Number(seance.textContent.trim().slice(3))) {
+      } else if(Number(tekushieChasy) === Number(seance.textContent.trim().slice(0,2))) {
+        if(Number(tekushieMinuty) > Number(seance.textContent.trim().slice(3))) {
           seance.classList.add("movie-seances__time_disabled");
+
         } else {
           seance.classList.remove("movie-seances__time_disabled");
         }
       } else {
         seance.classList.remove("movie-seances__time_disabled");
       }
+  
     } else {
       seance.classList.remove("movie-seances__time_disabled");
     }
-  });
+  })
 }
 
 // Переход в зал выбранного сеанса
 
-let selectedSeanceId;
+let idSeansa;
 
-function handleSeanceClick() {
-  seanceList = document.querySelectorAll(".movie-seances__time");
+function klikSeansa() {
+  spisokSeansovFilma = document.querySelectorAll(".movie-seances__time");
 
-  seanceList.forEach(seance => {
-    if (!seance.classList.contains("movie-seances__time_disabled")) {
+  spisokSeansovFilma.forEach(seance => {
+    if(!seance.classList.contains("movie-seances__time_disabled")) {
       seance.addEventListener("click", () => {
-        selectedSeanceId = seance.dataset.seanceid;
-        localStorage.setItem("seanceId", selectedSeanceId);
+        idSeansa = seance.dataset.seanceid;
+        localStorage.setItem("seanceId", idSeansa);
 
-        document.location = "./hall.html";
-      });
+        document.location="./hall.html";
+      })
     }
-  });
+  })
+
 }

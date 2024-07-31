@@ -1,53 +1,54 @@
-const currentSeanceId = Number(localStorage.getItem("seanceId"));
-const currentCheckedDate = localStorage.getItem("checkedDate");
-const selectedTickets = JSON.parse(localStorage.getItem("tickets"));
-const bookingInfo = JSON.parse(localStorage.getItem("ticketsInfo"));
+const idSeansa = Number(localStorage.getItem("seanceId"));
+const proverennayaData = localStorage.getItem("checkedDate");
+const bilety = JSON.parse(localStorage.getItem("tickets"));
+const informaciyaBiletov = JSON.parse(localStorage.getItem("ticketsInfo"));
 
-const movieTitleElement = document.querySelector(".ticket__info-movie");
-const seatNumbersElement = document.querySelector(".ticket__info-places");
-const hallNameElement = document.querySelector(".ticket__info-hall");
-const seanceTimeElement = document.querySelector(".ticket__info-time");
+const informaciyaFilma = document.querySelector(".ticket__info-movie");
+const informaciyaMest = document.querySelector(".ticket__info-places");
+const informaciyaZala = document.querySelector(".ticket__info-hall");
+const informaciyaVremeni = document.querySelector(".ticket__info-time");
 
-const qrCodeElement = document.querySelector(".ticket__info-qr");
-let qrText;
-let qrCodeImage;
+const qrKodBileta = document.querySelector(".ticket__info-qr");
+let tekstQr;
+let kodQr;
 
-let seatNumbers = [];
-let ticketCosts = [];
-let totalAmount;
+let mesta = [];
+let stoimost = [];
+let konechnayaSumma;
 
 // Отображение данных о билете
 
-function displayTicketInfo(data) {
-  const seanceIndex = data.result.seances.findIndex(item => item.id === Number(currentSeanceId));
-  const movieIndex = data.result.films.findIndex(item => item.id === data.result.seances[seanceIndex].seance_filmid);
-  const hallIndex = data.result.halls.findIndex(item => item.id === data.result.seances[seanceIndex].seance_hallid);
+function poluchitInformaciyu(data) {
+  let indexSeansa = data.result.seances.findIndex(item => item.id === Number(idSeansa));
+  let indexFilma = data.result.films.findIndex(item => item.id === data.result.seances[indexSeansa].seance_filmid);
+  let indexZala = data.result.halls.findIndex(item => item.id === data.result.seances[indexSeansa].seance_hallid);
 
-  movieTitleElement.textContent = data.result.films[movieIndex].film_name;
-  hallNameElement.textContent = data.result.halls[hallIndex].hall_name;
-  seanceTimeElement.textContent = data.result.seances[seanceIndex].seance_time;
+  informaciyaFilma.textContent = data.result.films[indexFilma].film_name;
+  informaciyaZala.textContent = data.result.halls[indexZala].hall_name;
+  informaciyaVremeni.textContent = data.result.seances[indexSeansa].seance_time;
 
-  selectedTickets.forEach(ticket => {
-    seatNumbers.push(`${ticket.row}/${ticket.place}`);
-    ticketCosts.push(ticket.coast);
-  });
+  bilety.forEach(ticket => {
+    mesta.push(ticket.row + "/" + ticket.place);
+    stoimost.push(ticket.coast);
+  })
 
-  seatNumbersElement.textContent = seatNumbers.join(", ");
-  totalAmount = ticketCosts.reduce((acc, price) => acc + price, 0);
+  informaciyaMest.textContent = mesta.join(", ");
+
+  konechnayaSumma = stoimost.reduce((acc, price) => acc + price, 0);
 
   // Создание QR-кода с информацией по билетам
 
-  qrText = `
-    Дата: ${currentCheckedDate}, 
-    Время: ${seanceTimeElement.textContent}, 
-    Название фильма: ${movieTitleElement.textContent}, 
-    Зал: ${hallNameElement.textContent}, 
-    Ряд/Место: ${seatNumbers.join(", ")}, 
-    Стоимость: ${totalAmount}, 
+  tekstQr = `
+    Дата: ${proverennayaData}, 
+    Время: ${informaciyaVremeni.textContent}, 
+    Название фильма: ${informaciyaFilma.textContent}, 
+    Зал: ${informaciyaZala.textContent}, 
+    Ряд/Место: ${mesta.join(", ")}, 
+    Стоимость: ${konechnayaSumma}, 
     Билет действителен строго на свой сеанс
-  `;
+  `
 
-  qrCodeImage = QRCreator(qrText, 
+  kodQr = QRCreator(tekstQr, 
     { mode: -1,
       eccl: 0,
       version: -1,
@@ -57,7 +58,8 @@ function displayTicketInfo(data) {
       margin: 3
     });
 
-  qrCodeElement.append(qrCodeImage.result);
+  qrKodBileta.append(kodQr.result);
+
   localStorage.clear();
 }
 
@@ -65,7 +67,7 @@ function displayTicketInfo(data) {
 
 fetch("https://shfe-diplom.neto-server.ru/alldata")
   .then(response => response.json())
-  .then(function (data) {
+  .then(function(data) {
     console.log(data);
-    displayTicketInfo(data);
-  });
+    poluchitInformaciyu(data);
+  })

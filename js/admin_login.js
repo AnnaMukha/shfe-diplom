@@ -1,24 +1,24 @@
-const authForm = document.querySelector(".login__form");
-const emailInput = document.querySelector(".login__email");
-const passwordInput = document.querySelector(".login__password");
+const formaVhoda = document.querySelector(".login__form");
+const emailVhoda = document.querySelector(".login__email");
+const parolVhoda = document.querySelector(".login__password");
 
-authForm.addEventListener("submit", (event) => {
-  event.preventDefault();
+formaVhoda.addEventListener("submit", (e) => {
+  e.preventDefault();
 
-  if (emailInput.value.trim() && passwordInput.value.trim()) {
-    const userData = new FormData(authForm);
+  if(emailVhoda.value.trim() && parolVhoda.value.trim()) {
+    const dannyeFormy = new FormData(formaVhoda);
 
     fetch("https://shfe-diplom.neto-server.ru/login", {
       method: "POST",
-      body: userData
+      body: dannyeFormy
     })
     .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        window.location.href = "./admin-index.html";
+    .then(function(data) {
+      if(data.success === true) {
+        document.location="./admin-index.html";
       } else {
-        alert("Invalid login/password!");
+        alert("Неверный логин/пароль!");
       }
-    });
+    })
   }
-});
+})

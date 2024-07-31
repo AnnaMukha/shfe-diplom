@@ -1,95 +1,95 @@
 // Добавление фильма
-const addMovieButton = document.querySelector(".admin__button_movie");
-const movieSeancesWrapper = document.querySelector(".movie-seances__wrapper");
+const knopkaDobavitFilm = document.querySelector(".admin__button_movie");
+const obertkaSeansovFilmov = document.querySelector(".movie-seances__wrapper");
 
 // Открытие popup "Добавить фильм"
 
-addMovieButton.addEventListener("click", () => {
-  popupMovieAdd.classList.remove("popup__hidden");
+knopkaDobavitFilm.addEventListener("click", () => {
+  popupDobavitFilm.classList.remove("popup__hidden");
 })
 
 // popup Добавление фильма
 
-const popupMovieAdd = document.querySelector(".popup__movie_add");
-const formAddMovie = document.querySelector(".popup__form_add-movie");
-const inputMovieName = document.querySelector(".add-movie_name_input");
-const inputMovieTime = document.querySelector(".add-movie_time_input");
-const inputMovieSynopsis = document.querySelector(".add-movie_synopsis_input");
-const inputMovieCountry = document.querySelector(".add-movie_country_input");
+const popupDobavitFilm = document.querySelector(".popup__movie_add");
+const formaDobavitFilm = document.querySelector(".popup__form_add-movie");
+const vvodNazvaniyaFilma = document.querySelector(".add-movie_name_input");
+const vvodVremyaFilma = document.querySelector(".add-movie_time_input");
+const vvodSinopsisFilma = document.querySelector(".add-movie_synopsis_input");
+const vvodStranyFilma = document.querySelector(".add-movie_country_input");
 
-const buttonPosterAdd = document.querySelector(".input_add_poster");
+const knopkaZagruzitPoster = document.querySelector(".input_add_poster");
 
-let posterFile;
+let filePoster;
 
 // Добавление фильма
 
-function addMovie(posterFile) {
-  const formData = new FormData();
-  let numbDuration = Number(inputMovieTime.value);
+function dobavitFilm(filePoster) {
+  const dannyeFormy = new FormData();
+  let chisloProdolzhitelnosti = Number(vvodVremyaFilma.value);
 
-  formData.set("filmName", `${inputMovieName.value}`);
-  formData.set("filmDuration", `${numbDuration}`);
-  formData.set("filmDescription", `${inputMovieSynopsis.value}`);
-  formData.set("filmOrigin", `${inputMovieCountry.value}`);
-  formData.set("filePoster", posterFile);
+  dannyeFormy.set("filmName", `${vvodNazvaniyaFilma.value}`);
+  dannyeFormy.set("filmDuration", `${chisloProdolzhitelnosti}`);
+  dannyeFormy.set("filmDescription", `${vvodSinopsisFilma.value}`);
+  dannyeFormy.set("filmOrigin", `${vvodStranyFilma.value}`);
+  dannyeFormy.set("filePoster", filePoster);
 
   fetch("https://shfe-diplom.neto-server.ru/film", {
     method: "POST",
-    body: formData
+    body: dannyeFormy
   })
     .then(response => response.json())
     .then(function(data) {
-      alert(`Фильм ${inputMovieName.value} добавлен!`);
+      alert(`Фильм ${vvodNazvaniyaFilma.value} добавлен!`);
       location.reload();  
     })
 }
 
 // Удаление фильма
 
-function deleteMovie(movieId) {
-  fetch(`https://shfe-diplom.neto-server.ru/film/${movieId}`, {
+function udalitFilm(filmId) {
+  fetch(`https://shfe-diplom.neto-server.ru/film/${filmId}`, {
     method: "DELETE",
   })
   .then(response => response.json())
   .then(function(data) {
-    alert(`Фильм ${movieId} удален!`);
+    alert(`Фильм ${filmId} удален!`);
     location.reload();
   })
 }
 
 // Загрузить постер
 
-buttonPosterAdd.addEventListener("change", event => {
+knopkaZagruzitPoster.addEventListener("change", event => {
   event.preventDefault();
-  let fileSize = buttonPosterAdd.files[0].size;
+  let razmerFayla = knopkaZagruzitPoster.files[0].size;
 
-  if(fileSize > 3000000) {
+  if(razmerFayla > 3000000) {
     alert("Размер файла должен быть не более 3 Mb!");
   } else {
-    posterFile = buttonPosterAdd.files[0];
+    filePoster = knopkaZagruzitPoster.files[0];
   }
 })
 
 // Добавить фильм
 
-formAddMovie.addEventListener("submit", (e) => {
+formaDobavitFilm.addEventListener("submit", (e) => {
   e.preventDefault();
-  if (posterFile === undefined) {
+  if (filePoster === undefined) {
     alert("Загрузите постер!");
     return;
   } else {
-  addMovie(posterFile);
+    dobavitFilm(filePoster);
   }
 })
 
 // Удалить фильм
 
-let movieId;
+let filmId;
 
-movieSeancesWrapper.addEventListener("click", (e) => {  
+obertkaSeansovFilmov.addEventListener("click", (e) => {  
   if(e.target.classList.contains("movie-seances__movie_delete")) {
-    movieId = e.target.closest(".movie-seances__movie").dataset.id;
-    deleteMovie(movieId);
+    filmId = e.target.closest(".movie-seances__movie").dataset.id;
+    udalitFilm(filmId);
   } else {
     return;
   }
@@ -97,12 +97,12 @@ movieSeancesWrapper.addEventListener("click", (e) => {
 
 // Отображение фильмов
 
-function moviesOperations(data) {
-  let movieCount = 1;
+function operaciiFilmov(data) {
+  let schetchikFilmov = 1;
 
   for(let i = 0; i < data.result.films.length; i++) {
-    movieSeancesWrapper.insertAdjacentHTML("beforeend", `
-    <div class="movie-seances__movie background_${movieCount}" data-id="${data.result.films[i].id}" draggable="true" >
+    obertkaSeansovFilmov.insertAdjacentHTML("beforeend", `
+    <div class="movie-seances__movie background_${schetchikFilmov}" data-id="${data.result.films[i].id}" draggable="true" >
               <img src="${data.result.films[i].film_poster}" alt="постер" class="movie-seances__movie_poster">
 
               <div class="movie-seances__movie_info">
@@ -114,10 +114,10 @@ function moviesOperations(data) {
             </div>
     `);
 
-    movieCount++;
+    schetchikFilmov++;
 
-    if (movieCount > 5) {
-      movieCount = 1;
+    if (schetchikFilmov > 5) {
+      schetchikFilmov = 1;
     }  
   }
 }

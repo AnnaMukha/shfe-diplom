@@ -1,558 +1,577 @@
 // Сетка сеансов
-let seanceTimeline;
-let movieTimeline;
-let currentMovie;
-let currentHall;
+let vremyaSeansov;
+let vremyaFilmov;
+let vybrannyyFilm;
+let vybrannyyZal;
 
-let hallSession;
-let startTime;
-let endTime;
-let sessionDuration;
-let sessionStart;
-let currentSessionStart;
-let sessionEnd;
+let seansyZal;
+let nachaloSeansa;
+let konecSeansa;
+let tekushayaProdolzhitelnostSeansa;
+let tekushiyNachaloSeansa;
+let tekushiySeansNachalo;
+let tekushiySeansKonec;
 
-let isSeanceAllowed = false;
+let seansyRazresheny = false;
 
 // Кнопки
 
-let seanceCancelBtn;
-let seanceSaveBtn;
+let otmenaSeansovFilmov;
+let sohranenieSeansovFilmov;
 
 // popup Добавление сеанса
 
-const popupAddSeance = document.querySelector(".popup__seance_add");
-const formSeanceAdd = document.querySelector(".popup__form_add-seance");
-const selectHall = document.querySelector(".select__add-seance_hall");
-let hallOption;
-let movieOption;
-const selectMovie = document.querySelector(".select__add-seance_movie");
-const inputSeanceStartTime = document.querySelector(".add-seans__input_time");
-let selectedHallId;
-let selectedMovieId;
-let selectedMovieName;
-let selectedMovieDuration;
-let seanceStartTime;
-let btnCancelSeance;
+const popupDobavitSeans = document.querySelector(".popup__seance_add");
+const formaDobavitSeans = document.querySelector(".popup__form_add-seance");
+const vyborSeansZal = document.querySelector(".select__add-seance_hall");
+let variantNazvaniyaZala;
+let variantNazvaniyaFilma;
+const vyborSeansFilm = document.querySelector(".select__add-seance_movie");
+const vvodVremeniSeansa = document.querySelector(".add-seans__input_time");
+let proverkaIdZala;
+let proverkaIdFilma;
+let proverkaNazvaniyaFilma;
+let proverkaProdolzhitelnostiFilma;
+let proverkaVremeniSeansa;
+let knopkaOtmenySeansa;
 
 // popup Удаление сеанса
 
-const popupRemoveSeance = document.querySelector(".popup__seance_remove");
-let removeSeanceTitle;
-let btnDeleteSeance;
-let btnCancelRemoveSeance;
+const popupUdalitSeans = document.querySelector(".popup__seance_remove");
+let zagolovokUdalitSeans;
+let knopkaUdalitSeans;
+let knopkaOtmenyUdalitSeans;
 
 // Удаление сеансов
 
-let seanceElements;
-let deleteElements;
+let vybrannyeSeansy;
+let vybrannyeDlyaUdalenia;
 
-let activeSeance;
-let activeSeanceId;
-let timelineElement;
-let activeHallId;
-let activeMovieName;
+let vybrannyySeans;
+let vybrannyyIdSeansa;
+let vybrannyyVremya;
+let vybrannyyIdZala;
+let vybrannoeNazvaniyeFilma;
 
-let removedSeances = [];
-let filteredRemovedSeances = [];
+let udalennyeSeansy = [];
+let filtorUdalennykhSeansov = [];
 
 // Загрузка сеансов
 
-function loadSessions(data) {
-  seanceTimeline.forEach(timeline => {
+function zagruzkaSeansov(data) {
+  vremyaSeansov.forEach(timeline => {
     timeline.innerHTML = "";
 
-    for (let i = 0; i < data.result.seances.length; i++) {
-      let movieId = data.result.films.findIndex(element => element.id === Number(data.result.seances[i].seance_filmid));
-
-      if (Number(timeline.dataset.id) === data.result.seances[i].seance_hallid) {
+    for(let i = 0; i < data.result.seances.length; i++) {
+      let idFilmaSeansa = data.result.films.findIndex(element => element.id === Number(data.result.seances[i].seance_filmid));
+      
+      if(Number(timeline.dataset.id) === data.result.seances[i].seance_hallid) {
         timeline.insertAdjacentHTML("beforeend", `
-          <div class="timeline__seances_movie" data-filmid="${data.result.seances[i].seance_filmid}" data-seanceid="${data.result.seances[i].id}" draggable="true">
-            <p class="timeline__seances_title">${data.result.films[movieId].film_name}</p>
-            <p class="timeline__movie_start" data-duration="${data.result.films[movieId].film_duration}">${data.result.seances[i].seance_time}</p>
-          </div>
+        <div class="timeline__seances_movie" data-filmid="${data.result.seances[i].seance_filmid}" data-seanceid="${data.result.seances[i].id}" draggable="true">
+          <p class="timeline__seances_title">${data.result.films[idFilmaSeansa].film_name}</p>
+          <p class="timeline__movie_start" data-duration="${data.result.films[idFilmaSeansa].film_duration}">${data.result.seances[i].seance_time}</p>
+        </div>
         `);
       }
     }
-  });
+    
+  })
 
   // Загрузка фона сеансов
 
-  setSeanceBackground();
+  ustanovitFonFilma();
 
   // Позиционирование сеансов
-
-  positionSessions();
+  
+  pozitsiyaSeansa();
 
   // Отслеживание изменения ширины окна
 
   window.addEventListener("resize", event => {
-    positionSessions();
-  });
+    pozitsiyaSeansa();
+  })
 
   // Кнопка Отмена под сеткой сеансов
 
-  seanceCancelBtn = document.querySelector(".movie-seances__batton_cancel");
+  otmenaSeansovFilmov = document.querySelector(".movie-seances__batton_cancel");
 
-  seanceCancelBtn.addEventListener("click", event => {
-    if (seanceCancelBtn.classList.contains("button_disabled")) {
+  otmenaSeansovFilmov.addEventListener("click", event => {
+    if(otmenaSeansovFilmov.classList.contains("button_disabled")) {
       event.preventDefault();
     } else {
       event.preventDefault();
-      removedSeances.length = 0;
-      filteredRemovedSeances.length = 0;
-      loadSessions(data);
+      udalennyeSeansy.length = 0;
+      filtorUdalennykhSeansov.length = 0;
+      zagruzkaSeansov(data);
+    
+      udalitSeans();
 
-      removeSession();
-
-      seanceCancelBtn.classList.add("button_disabled");
-      seanceSaveBtn.classList.add("button_disabled");
+      otmenaSeansovFilmov.classList.add("button_disabled");
+      sohranenieSeansovFilmov.classList.add("button_disabled");
     }
-  });
+  })
 }
 
 // Установка цвета фона для фильмов в таймлайнах
 
-function setSeanceBackground() {
-  const movies = document.querySelectorAll(".movie-seances__movie");
-  let movieBg;
-  const movieInfoArray = [];
+function ustanovitFonFilma() {
+  const filmy = document.querySelectorAll(".movie-seances__movie");
+  let fonFilma;
+  const informaciyaFilmy = new Array();
 
   // Собираем массив из загруженных фильмов и сохраняем номер цвета фона в каждом
 
-  movies.forEach(movie => {
-    movieBg = movie.classList.value.match(/\d+/)[0];
+  filmy.forEach(movie => {
+    fonFilma = movie.classList.value.match(/\d+/)[0];
 
-    const movieInfo = {};
-    movieInfo.movieId = movie.dataset.id;
-    movieInfo.background = movieBg;
+    const informaciyaFilma = new Object();
+    informaciyaFilma.movieInfoId = movie.dataset.id;
+    informaciyaFilma.background = fonFilma;
 
-    movieInfoArray.push(movieInfo);
-  });
+    informaciyaFilmy.push(informaciyaFilma);
+  })
 
   // Проставление номера цвета фона в фильмы в таймлайне с сеансами
 
-  movieTimeline = Array.from(document.querySelectorAll(".timeline__seances_movie"));
+  vremyaFilmov = Array.from(document.querySelectorAll(".timeline__seances_movie"));
 
-  movieTimeline.forEach(element => {
-    for (let i = 0; i < movieInfoArray.length; i++)
-      if (Number(element.dataset.filmid) === Number(movieInfoArray[i].movieId)) {
-        element.classList.add(`background_${movieInfoArray[i].background}`);
+  vremyaFilmov.forEach(element => {
+    for (let i = 0; i < informaciyaFilmy.length; i++)
+      if(Number(element.dataset.filmid) === Number(informaciyaFilmy[i].movieInfoId)) {
+        element.classList.add(`background_${informaciyaFilmy[i].background}`);
       }
-  });
+  })
+
 }
 
 // Позиционирование сеансов по таймлайну и определение ширины блока с сеансом (длительность фильма)
 
-let totalMinutesInDay = 24 * 60;
-let startSession;
-let movieLength;
-let movieBlockWidth;
-let sessionPosition;
+let denVMinutakh = 24 * 60;
+let nachaloSeansaFilma;
+let prodolzhitelnostFilma;
+let shirinaFilma;
+let pozitsiyaSeansaFilma;
 
-function positionSessions() {
-  movieTimeline.forEach(item => {
+function pozitsiyaSeansa() {
+
+  vremyaFilmov.forEach(item => {
     let time = item.lastElementChild.textContent.split(":", [2]);
-    let hours = Number(time[0]);
+    let hours = Number(time[0]); 
     let minutes = Number(time[1]);
 
-    startSession = (hours * 60) + minutes;
-    sessionPosition = (startSession / totalMinutesInDay) * 100;
+    nachaloSeansaFilma = (hours * 60) + minutes;
+    pozitsiyaSeansaFilma = (nachaloSeansaFilma / denVMinutakh) * 100;
 
-    movieLength = item.lastElementChild.dataset.duration;
-    movieBlockWidth = (movieLength / totalMinutesInDay) * 100;
+    prodolzhitelnostFilma = item.lastElementChild.dataset.duration;
+    shirinaFilma = (prodolzhitelnostFilma / denVMinutakh) * 100;
 
-    item.style.left = sessionPosition + "%";
-    item.style.width = movieBlockWidth + "%";
+    item.style.left = pozitsiyaSeansaFilma + "%";
+    item.style.width = shirinaFilma + "%";
 
     // Уменьшение размера шрифта и padding при слишком маленькой ширине сеанса
 
-    if (item.dataset.change === "true") {
+    if(item.dataset.change === "true") {
       item.firstElementChild.style.fontSize = "10px";
       item.style.padding = "10px";
     }
 
-    let movieBlockPxWidth = item.getBoundingClientRect().width;
+    let shirinaFilmaPx = item.getBoundingClientRect().width;
 
-    if (movieBlockPxWidth < 40) {
+    if(shirinaFilmaPx < 40) {
       item.firstElementChild.style.fontSize = "8px";
       item.style.padding = "5px";
       item.dataset.change = "true";
-    }
-  });
+    } 
+  })
+
 }
 
 // Перетаскивание фильма в таймлайн зала (открытие popup Добавление сеанса)
 
-function openSeancePopup(data) {
-  const movieElements = document.querySelectorAll(".movie-seances__movie");
-  const hallTimelines = document.querySelectorAll(".timeline__seances");
+function otkritPopupSeansa(data) {
+
+  const massivFilmov = document.querySelectorAll(".movie-seances__movie");
+  const massivZalov = document.querySelectorAll(".timeline__seances");
 
   // Определение выбранного элемента
 
-  let draggedElement;
+  let vybrannyyElement;
 
-  movieElements.forEach(movie => {
-    movie.addEventListener("dragstart", (event) => {
-      currentMovie = movie.dataset.id;
-      draggedElement = event.target;
-    });
-  });
+  massivFilmov.forEach(movie => {
+    movie.addEventListener("dragstart", (event) => {  
+      vybrannyyFilm = movie.dataset.id;
+      vybrannyyElement = event.target;
+    }) 
+  })
 
   // Очищаем значение выбранного элемента, если элемент отпущен
 
-  movieElements.forEach(movie => {
-    movie.addEventListener("dragend", () => {
-      draggedElement = undefined;
-    });
-  });
+  massivFilmov.forEach(movie => {
+    movie.addEventListener("dragend", () => {  
+      vybrannyyElement = undefined;
+    }) 
+  })
 
-  hallTimelines.forEach(timeline => {
+  massivZalov.forEach(timeline => {
     timeline.addEventListener("dragover", (event) => {
       event.preventDefault();
-    });
-  });
+    })
+  })
 
-  hallTimelines.forEach(timeline => {
+  massivZalov.forEach(timeline => {
     timeline.addEventListener("drop", (event) => {
       event.preventDefault();
-
-      if (draggedElement === undefined) {
+      
+      if(vybrannyyElement === undefined) {
         return;
       }
 
-      currentHall = timeline.dataset.id;
-
+      vybrannyyZal = timeline.dataset.id;
+      
       // Открытие popup "Добавление сеанса"
 
-      popupAddSeance.classList.remove("popup__hidden");
+      popupDobavitSeans.classList.remove("popup__hidden");
 
       // Очищение значений в popup
 
-      selectHall.innerHTML = "";
-      selectMovie.innerHTML = "";
-      formSeanceAdd.reset();
+      vyborSeansZal.innerHTML = "";
+      vyborSeansFilm.innerHTML = "";
+      formaDobavitSeans.reset();
 
       // Формирование select "Название зала"
 
-      data.result.halls.forEach(hall => {
-        selectHall.insertAdjacentHTML("beforeend", `
-          <option class="option_add-seance hall__name" data-id="${hall.id}">${hall.hall_name}</option>
+      for(let i = 0; i < data.result.halls.length; i++) {
+        vyborSeansZal.insertAdjacentHTML("beforeend", `
+        <option class="option_add-seance hall__name" data-id="${data.result.halls[i].id}">${data.result.halls[i].hall_name}</option>
         `);
-      });
+      } 
 
-      hallOption = document.querySelectorAll(".hall__name");
+      variantNazvaniyaZala = document.querySelectorAll(".hall__name");
 
-      hallOption.forEach(hallName => {
-        if (Number(hallName.dataset.id) === Number(currentHall)) {
+      variantNazvaniyaZala.forEach(hallName => {
+        if(Number(hallName.dataset.id) === Number(vybrannyyZal)) {
           hallName.setAttribute("selected", "true");
         }
-      });
+      })
 
       // Формирование select "Название фильма"
 
-      data.result.films.forEach(film => {
-        selectMovie.insertAdjacentHTML("beforeend", `
-          <option class="option_add-seance movie__name" data-id="${film.id}" data-duration="${film.film_duration}">${film.film_name}</option>
+      for(let i = 0; i < data.result.films.length; i++) {
+        vyborSeansFilm.insertAdjacentHTML("beforeend", `
+          <option class="option_add-seance movie__name" data-id="${data.result.films[i].id}" data-duration="${data.result.films[i].film_duration}">${data.result.films[i].film_name}</option>
         `);
-      });
+      } 
 
-      movieOption = document.querySelectorAll(".movie__name");
+      variantNazvaniyaFilma = document.querySelectorAll(".movie__name");
 
-      movieOption.forEach(movieName => {
-        if (Number(movieName.dataset.id) === Number(currentMovie)) {
+      variantNazvaniyaFilma.forEach(movieName => {
+        if(Number(movieName.dataset.id) === Number(vybrannyyFilm)) {
           movieName.setAttribute("selected", "true");
         }
-      });
-    });
-  });
+      })
+
+    })
+  })
 }
 
 // Клик по кнопке "Добавить сеанс"
 
-let checkedSeances = [];
+let proverennyeSeansy = [];
 
-function handleAddSeanceButton() {
-  formSeanceAdd.addEventListener("submit", (event) => {
+function klikKnopkiDobavitSeans() {
+  formaDobavitSeans.addEventListener("submit", (event) => {
     event.preventDefault();
-    checkedSeances.length = 0;
+    proverennyeSeansy.length = 0;
 
     // Сохранение данных по залу
 
-    let selectedHall = selectHall.value;
+    let proverkaZala = vyborSeansZal.value;
 
-    hallOption.forEach(hallName => {
-      if (hallName.textContent === selectedHall) {
-        selectedHallId = hallName.dataset.id;
+    variantNazvaniyaZala.forEach(hallName => {
+      if(hallName.textContent === proverkaZala) {
+        proverkaIdZala = hallName.dataset.id;
       }
-    });
+    })
 
     // Сохранение данных по фильму
 
-    let selectedMovie = selectMovie.value;
+    let proverkaFilma = vyborSeansFilm.value;
 
-    movieOption.forEach(movieName => {
-      if (movieName.textContent === selectedMovie) {
-        selectedMovieId = movieName.dataset.id;
-        selectedMovieName = selectedMovie;
-        selectedMovieDuration = movieName.dataset.duration;
+    variantNazvaniyaFilma.forEach(movieName => {
+      if(movieName.textContent === proverkaFilma) {
+        proverkaIdFilma = movieName.dataset.id;
+        proverkaNazvaniyaFilma = proverkaFilma;
+        proverkaProdolzhitelnostiFilma = movieName.dataset.duration;
       }
-    });
+    })
 
     // Сохранение данных по выбранному времени
 
-    seanceStartTime = inputSeanceStartTime.value;
+    proverkaVremeniSeansa = vvodVremeniSeansa.value;
 
-    let time = seanceStartTime.split(':', [2]);
-    startTime = Number(time[0]) * 60 + Number(time[1]);
+    let vremyaSeansa = proverkaVremeniSeansa.split(':', [2]);
+    nachaloSeansa = Number(vremyaSeansa[0]) * 60 + Number(vremyaSeansa[1]);
 
-    endTime = startTime + Number(selectedMovieDuration);
+    konecSeansa = nachaloSeansa + Number(proverkaProdolzhitelnostiFilma);
 
     // Последний сеанс должен заканчиваться не позднее 23:59
 
-    let endOfDay = 23 * 60 + 59;
+    let posledneeVremya = 23 * 60 + 59;
 
-    if (endTime > endOfDay) {
+    if(konecSeansa > posledneeVremya) {
       alert("Последний сеанс должен заканчиваться не позднее 23:59!");
       return;
     }
 
     // Проверка на пересечение с другими сеансами в зале
 
-    seanceTimeline = document.querySelectorAll(".timeline__seances");
-
+    vremyaSeansov = document.querySelectorAll(".timeline__seances");
+    
     // Сбор сеансов в искомом зале
 
-    seanceTimeline.forEach(timeline => {
-      if (Number(timeline.dataset.id) === Number(selectedHallId)) {
-        hallSession = Array.from(timeline.querySelectorAll(".timeline__seances_movie"));
+    vremyaSeansov.forEach(timeline => {
+      if(Number(timeline.dataset.id) === Number(proverkaIdZala)) {
+        seansyZal = Array.from(timeline.querySelectorAll(".timeline__seances_movie"));
       }
-    });
+    })
 
     // Если зал пуст, без проверки сеансов закрыть popup и добавить новый сеанс
 
-    if (hallSession.length === 0) {
-      popupAddSeance.classList.add("popup__hidden");
-      createNewSeance();
+    if (seansyZal.length === 0) {
+      popupDobavitSeans.classList.add("popup__hidden");
+      dobavitNovyySeans();
       return;
     }
 
     // Информация о всех существующих сеансах в конкретном зале
 
-    hallSession.forEach(seance => {
-      // Получение длительности фильма в каждом существующем сеансе
+    for (let seance of seansyZal) {
 
-      sessionDuration = seance.lastElementChild.dataset.duration;
+      // Получение длительности фильма в каждом существующем сеансе
+      
+      tekushayaProdolzhitelnostSeansa = seance.lastElementChild.dataset.duration;
 
       // Получение времени начала каждого существующего сеанса
 
-      sessionStart = seance.lastElementChild.textContent;
-
+      tekushiyNachaloSeansa = seance.lastElementChild.textContent;
+ 
       // Расчет старта и окончания каждого существующего сеанса
 
-      let sessionTime = sessionStart.split(':', [2]);
-      currentSessionStart = Number(sessionTime[0]) * 60 + Number(sessionTime[1]);
+      let tekushiySeansTime = tekushiyNachaloSeansa.split(':', [2]);
+      tekushiySeansNachalo = Number(tekushiySeansTime[0]) * 60 + Number(tekushiySeansTime[1]);
 
-      sessionEnd = currentSessionStart + Number(sessionDuration);
+      tekushiySeansKonec = tekushiySeansNachalo + Number(tekushayaProdolzhitelnostSeansa);
 
       // Проверка добавляемого сеанса
 
-      if (startTime >= currentSessionStart && startTime <= sessionEnd) {
+      if(nachaloSeansa >= tekushiySeansNachalo && nachaloSeansa <= tekushiySeansKonec) {
         alert("Новый сеанс пересекается по времени с существующими!");
-        checkedSeances.push("false");
-        return;
-      } else if (endTime >= currentSessionStart && endTime <= sessionEnd) {
+        proverennyeSeansy.push("false");
+        break;
+      } else if (konecSeansa >= tekushiySeansNachalo && konecSeansa <= tekushiySeansKonec) {
         alert("Новый сеанс пересекается по времени с существующими!");
-        checkedSeances.push("false");
-        return;
+        proverennyeSeansy.push("false");
+        break;
       } else {
-        checkedSeances.push("true");
+        proverennyeSeansy.push("true");
       }
-    });
 
-    if (!checkedSeances.includes("false")) {
-      popupAddSeance.classList.add("popup__hidden");
-      createNewSeance();
     }
-  });
+
+    if(!proverennyeSeansy.includes("false")) {
+      popupDobavitSeans.classList.add("popup__hidden");
+      dobavitNovyySeans();
+    } else {
+      return;
+    }
+
+  })
 }
 
 // Добавление сеанса в таймлайн зала
 
-function createNewSeance() {
-  seanceCancelBtn.classList.remove("button_disabled");
-  seanceSaveBtn.classList.remove("button_disabled");
+function dobavitNovyySeans() {
+  otmenaSeansovFilmov.classList.remove("button_disabled");
+  sohranenieSeansovFilmov.classList.remove("button_disabled");
 
-  seanceTimeline.forEach(timeline => {
-    if (Number(timeline.dataset.id) === Number(selectedHallId)) {
+  vremyaSeansov.forEach(timeline => {
+    if (Number(timeline.dataset.id) === Number(proverkaIdZala)) {
       timeline.insertAdjacentHTML("beforeend", `
-        <div class="timeline__seances_movie" data-filmid="${selectedMovieId}" data-seanceid="" draggable="true">
-          <p class="timeline__seances_title">${selectedMovieName}</p>
-          <p class="timeline__movie_start" data-duration="${selectedMovieDuration}">${seanceStartTime}</p>
-        </div>
+      <div class="timeline__seances_movie" data-filmid="${proverkaIdFilma}" data-seanceid="" draggable="true">
+        <p class="timeline__seances_title">${proverkaNazvaniyaFilma}</p>
+        <p class="timeline__movie_start" data-duration="${proverkaProdolzhitelnostiFilma}">${proverkaVremeniSeansa}</p>
+      </div>
       `);
-    }
-  });
+    }      
+    
+  })
 
-  setSeanceBackground();
-  positionSessions();
-  removeSession();
+  ustanovitFonFilma();
+  
+  pozitsiyaSeansa();
+
+  udalitSeans();
 }
+
 
 // Удаление сеанса из таймлайна
 
-function removeSession() {
-  seanceElements = document.querySelectorAll(".timeline__seances_movie");
+function udalitSeans() {
+  vybrannyeSeansy = document.querySelectorAll(".timeline__seances_movie");
 
   // Определение выбранного сеанса
 
-  let draggedSeance;
+  let vybrannyyElement;
 
-  seanceElements.forEach(seance => {
+  vybrannyeSeansy.forEach(seance => {
     seance.addEventListener("dragstart", (event) => {
-      activeSeance = seance;
-      timelineElement = seance.closest(".movie-seances__timeline");
-      currentMovie = seance.dataset.filmid;
-      activeMovieName = seance.firstElementChild.textContent;
-      activeHallId = seance.parentElement.dataset.id;
-      deleteElements = timelineElement.firstElementChild;
+      vybrannyySeans = seance;
+      vybrannyyVremya = seance.closest(".movie-seances__timeline");
+      vybrannyyFilm = seance.dataset.filmid;
+      vybrannoeNazvaniyeFilma = seance.firstElementChild.textContent;
+      vybrannyyIdZala = seance.parentElement.dataset.id;
+      vybrannyeDlyaUdalenia = vybrannyyVremya.firstElementChild;
 
-      deleteElements.classList.remove("hidden");
+      vybrannyeDlyaUdalenia.classList.remove("hidden");
 
-      draggedSeance = event.target;
+      vybrannyyElement = event.target;
 
-      deleteElements.addEventListener("dragover", (event) => {
+      vybrannyeDlyaUdalenia.addEventListener("dragover", (event) => {  
         event.preventDefault();
-      });
-
-      deleteElements.addEventListener("drop", (event) => {
+      })
+    
+      vybrannyeDlyaUdalenia.addEventListener("drop", (event) => {  
         event.preventDefault();
-
+    
         // Открытие popup "Удаление сеанса"
+    
+        popupUdalitSeans.classList.remove("popup__hidden");
 
-        popupRemoveSeance.classList.remove("popup__hidden");
+        zagolovokUdalitSeans = document.querySelector(".seance-remove_title");
+        zagolovokUdalitSeans.textContent = vybrannoeNazvaniyeFilma;
 
-        removeSeanceTitle = document.querySelector(".seance-remove_title");
-        removeSeanceTitle.textContent = activeMovieName;
-
-        btnDeleteSeance = document.querySelector(".popup__remove-seance_button_delete");
+        knopkaUdalitSeans = document.querySelector(".popup__remove-seance_button_delete");
 
         // Кнопка "Удалить" в popup "Удаление сеанса"
 
-        btnDeleteSeance.addEventListener("click", (e) => {
+        knopkaUdalitSeans.addEventListener("click", (e) => {
           e.preventDefault();
 
-          popupRemoveSeance.classList.add("popup__hidden");
+          popupUdalitSeans.classList.add("popup__hidden");
 
-          if (activeSeance.dataset.seanceid !== "") {
-            activeSeanceId = activeSeance.dataset.seanceid;
-            removedSeances.push(activeSeanceId);
+          if(vybrannyySeans.dataset.seanceid !== "") {
+            vybrannyyIdSeansa = vybrannyySeans.dataset.seanceid;
+            udalennyeSeansy.push(vybrannyyIdSeansa);
           }
 
-          activeSeance.remove();
+          vybrannyySeans.remove();
 
           // Очищение массива с удаляемыми сеансами от повторов
 
-          filteredRemovedSeances = removedSeances.filter((item, index) => {
-            return removedSeances.indexOf(item) === index;
+          filtorUdalennykhSeansov = udalennyeSeansy.filter((item, index) => {
+            return udalennyeSeansy.indexOf(item) === index;
           });
 
-          if (filteredRemovedSeances.length !== 0) {
-            seanceCancelBtn.classList.remove("button_disabled");
-            seanceSaveBtn.classList.remove("button_disabled");
+          if(filtorUdalennykhSeansov.length !== 0) {
+            otmenaSeansovFilmov.classList.remove("button_disabled");
+            sohranenieSeansovFilmov.classList.remove("button_disabled");
           } else {
-            seanceCancelBtn.classList.add("button_disabled");
-            seanceSaveBtn.classList.add("button_disabled");
+            otmenaSeansovFilmov.classList.add("button_disabled");
+            sohranenieSeansovFilmov.classList.add("button_disabled");
           }
-        });
-      });
-    });
-  });
+        
+        })
 
-  seanceElements.forEach(seance => {
+      })
+
+    })
+  })
+
+  vybrannyeSeansy.forEach(seance => {
     seance.addEventListener("dragend", () => {
-      draggedSeance = undefined;
-      deleteElements.classList.add("hidden");
-    });
-  });
+      vybrannyyElement = undefined;
+      vybrannyeDlyaUdalenia.classList.add("hidden");
+    })
+  })
+
 }
 
 // Отображение сеансов
 
-function manageSeances(data) {
-  seanceTimeline = document.querySelectorAll(".timeline__seances");
+function operaciiSeansov(data) {
+  vremyaSeansov = document.querySelectorAll(".timeline__seances");
 
   // Загрузкa сеансов
 
-  loadSessions(data);
+  zagruzkaSeansov(data);
 
-  openSeancePopup(data);
-  handleAddSeanceButton();
+  otkritPopupSeansa(data);
+  klikKnopkiDobavitSeans();
 
-  removeSession();
+  udalitSeans();
 }
 
 // Кнопка Сохранить под сеткой сеансов
 
-seanceSaveBtn = document.querySelector(".movie-seances__batton_save");
+sohranenieSeansovFilmov = document.querySelector(".movie-seances__batton_save");
 
 // Сохранить сетку сеансов
 
-seanceSaveBtn.addEventListener("click", event => {
-  if (seanceSaveBtn.classList.contains("button_disabled")) {
+sohranenieSeansovFilmov.addEventListener("click", event => {
+  if(sohranenieSeansovFilmov.classList.contains("button_disabled")) {
     event.preventDefault();
   } else {
     event.preventDefault();
 
-    const sessionArray = Array.from(document.querySelectorAll(".timeline__seances_movie"));
+    const massivSeansov = Array.from(document.querySelectorAll(".timeline__seances_movie"));
 
     // Добавление сеансов
 
-    sessionArray.forEach(seance => {
-      if (seance.dataset.seanceid === "") {
+    massivSeansov.forEach(seance => {
+      if(seance.dataset.seanceid === "") {
         const params = new FormData();
         params.set("seanceHallid", `${seance.parentElement.dataset.id}`);
         params.set('seanceFilmid', `${seance.dataset.filmid}`);
         params.set('seanceTime', `${seance.lastElementChild.textContent}`);
-        addSeanceToServer(params);
+        dobavitSeans(params);
       }
-    });
-
+    })
+    
     // Удаление сеансов
 
-    if (filteredRemovedSeances.length !== 0) {
-      filteredRemovedSeances.forEach(seance => {
+    if (filtorUdalennykhSeansov.length !== 0) {
+      filtorUdalennykhSeansov.forEach(seance => {
         let seanceId = seance;
-        removeSeanceFromServer(seanceId);
-      });
+        udalitSeansy(seanceId);
+      })
     }
 
     alert("Сеансы сохранены!");
     location.reload();
-  }
-});
+ }
+})
 
 // Добавить сеанс на сервер
 
-function addSeanceToServer(params) {
+function dobavitSeans(params) {
   fetch("https://shfe-diplom.neto-server.ru/seance", {
-    method: "POST",
-    body: params
+  method: "POST",
+  body: params 
+})
+  .then(response => response.json())
+  .then(function(data) { 
+    console.log(data);
   })
-    .then(response => response.json())
-    .then(function (data) {
-      console.log(data);
-    });
 }
 
 // Удалить сеанс с сервера
 
-function removeSeanceFromServer(seanceId) {
+function udalitSeansy(seanceId) {
   fetch(`https://shfe-diplom.neto-server.ru/seance/${seanceId}`, {
     method: "DELETE",
   })
     .then(response => response.json())
-    .then(function (data) {
+    .then(function(data) {
       console.log(data);
-    });
+    })
 }
